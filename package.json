@@ -1,0 +1,17 @@
+{
+  "name": "546_proj",
+  "version": "1.0.0",
+  "description": "Final Project",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joshua Bekkerman 20013619",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.8.3",
+    "express": "^4.21.2"
+  }
+}
