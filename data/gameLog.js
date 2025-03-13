@@ -7,9 +7,17 @@ async function getGameLogByLeague(league) {
         if (league === "NHL") {
 
             return await getTodaysNHLGameLog();
+        }
+        else if (league === "NBA") {
+
+            return "Not Yet Implemented";
+        } 
+        else if (league === "MLB") {
+
+            return "Not Yet Implemented";
         } 
         else {
-            throw `Error: ${league} is not a supported. Supported leagues include: 'NHL'.`;
+            throw `Error: ${league} is not currently supported. Supported leagues include: 'NHL', 'NBA', and 'MLB'.`;
         }
     } catch (error) {
         throw error;
