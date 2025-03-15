@@ -7,7 +7,7 @@ router
   .route('/')
   .get(async (req, res) => {    // Get all sports game logs
     try {
-      const gameLog = await gamesData.getAllGames();
+      const gameLog = await gamesData.getAllLeaguesGameLogs();
       return res.json(gameLog);
     } catch (e) {
       return res.status(500).send(e);
