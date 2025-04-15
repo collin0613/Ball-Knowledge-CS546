@@ -31,19 +31,6 @@ export const getInSeasonSports = async () => {
   
 }
 
-// axios.get('https://api.the-odds-api.com/v4/sports', {
-//   params: {
-//     apiKey
-//   }
-// })
-// .then(response => {
-//     console.log(response.data);
-//   })
-// .catch(error => {
-//     console.log('Error status: ', error.response.status);
-//     console.log(error.response.data);
-//   });
-
 
 //function that makes an API call to Odds API and gets a list of live & upcoming games for a chosen sport, along with odds for different
 //bookmakers.
@@ -70,69 +57,6 @@ export const getOddsBySport = async (sportKey) => {
     console.error(e.response?.data);
     throw e;
   }
-  // const response = axios.get(`https://api.the-odds-api.com/v4/sports/${sportKey}/odds`, {
-  //   params: {
-  //     apiKey: apiKey,
-  //     regions: regions,
-  //     markets: markets,
-  //     oddsFormat: oddsFormat,
-  //     dateFormat: dateFormat,
-  //   }
-  // })
-  // .then(response => {
-  //     //response.data.data contains a list of live and upcoming events and odds for different bookmakers.
-  //     //events are ordered by start time (live events are first)
-  //     console.log(JSON.stringify(response.data));
-  //     //check usage
-  //     console.log('Remaining requests', response.headers['x-requests-remaining']);
-  //     console.log('Used requests', response.headers['x-requests-used']);
-  //   })
-  // .catch(error => {
-  //     console.log('Error status: ', error.response.status);
-  //     console.log(error.response.data);
-  //   });
-  //
-  // return response;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-// axios.get(`https://api.the-odds-api.com/v4/sports/${sportKey}/odds`, {
-//   params: {
-//     apiKey,
-//     regions,
-//     markets,
-//     oddsFormat,
-//     dateFormat,
-//   }
-// })
-// .then(response => {
-//     //response.data.data contains a list of live and upcoming events and odds for different bookmakers.
-//     //events are ordered by start time (live events are first)
-//     console.log(JSON.stringify(response.data));
-//     //check usage
-//     console.log('Remaining requests', response.headers['x-requests-remaining']);
-//     console.log('Used requests', response.headers['x-requests-used']);
-//   })
-// .catch(error => {
-//     console.log('Error status: ', error.response.status);
-//     console.log(error.response.data);
-//   });
-
-
-
 
