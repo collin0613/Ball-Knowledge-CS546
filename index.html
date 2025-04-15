@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GS Sportsbook</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+      <h1 class="text-3xl font-bold text-blue-600 mb-6">
+        GS Sportsbook
+      </h1>
+      
+      <div class="flex space-x-2 mb-6">
+        <button id="all-tab" class="px-4 py-2 rounded-md tab-active">All Leagues</button>
+        <button id="nhl-tab" class="px-4 py-2 rounded-md bg-gray-200">NHL</button>
+        <button id="nba-tab" class="px-4 py-2 rounded-md bg-gray-200">NBA</button>
+        <button id="mlb-tab" class="px-4 py-2 rounded-md bg-gray-200">MLB</button>
+      </div>
+      
+      <div id="games-container" class="mt-4">
+        <div id="loading" class="loading">Loading game data...</div>
+        <div id="error" class="error" style="display: none">Failed to load game data. Please try again later.</div>
+        <div id="all-leagues" style="display: none"></div>
+        <div id="nhl-games" style="display: none"></div>
+        <div id="nba-games" style="display: none"></div>
+        <div id="mlb-games" style="display: none"></div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const tabs = {
+          'all-tab': 'all-leagues',
+          'nhl-tab': 'nhl-games',
+          'nba-tab': 'nba-games',
+          'mlb-tab': 'mlb-games'
+        };
+        
+        // Tab switching functionality
+        Object.keys(tabs).forEach(tabId => {
+          document.getElementById(tabId).addEventListener('click', function() {
+            // Reset all tabs
+            Object.keys(tabs).forEach(id => {
+              document.getElementById(id).classList.remove('tab-active');
+              document.getElementById(id).classList.add('bg-gray-200');
+              document.getElementById(tabs[id]).style.display = 'none';
+            });
+            
+            // Activate selected tab
+            this.classList.remove('bg-gray-200');
+            this.classList.add('tab-active');
+            document.getElementById(tabs[tabId]).style.display = 'block';
+          });
+        });
+        
+        // Fetch all leagues data
+        fetchAllGames();
+        
+        function fetchAllGames() {
+          fetch('http://localhost:3000/gamelog', {
+              headers: {
+                'Accept': 'application/json'
+              }
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              document.getElementById('loading').style.display = 'none';
+              renderAllLeagues(data);
+              renderLeague(data.NHL, 'nhl-games', 'NHL');
+              renderLeague(data.NBA, 'nba-games', 'NBA');
+              renderLeague(data.MLB, 'mlb-games', 'MLB');
+              
+              // Show the all leagues tab by default
+              document.getElementById('all-leagues').style.display = 'block';
+            })
+            .catch(error => {
+              document.getElementById('loading').style.display = 'none';
+              document.getElementById('error').style.display = 'block';
+              document.getElementById('error').textContent = `Failed to load game data: ${error.message}`;
+              console.error('Error fetching game data:', error);
+            });
+        }
+        
+        function renderAllLeagues(data) {
+          const container = document.getElementById('all-leagues');
+          container.innerHTML = '';
+          
+          // Create a section for each league
+          ['NHL', 'NBA', 'MLB'].forEach(league => {
+            if (data[league] && data[league].length > 0) {
+              const leagueSection = document.createElement('div');
+              leagueSection.className = 'league-section';
+              
+              const leagueHeading = document.createElement('h2');
+              leagueHeading.className = 'text-2xl font-bold mb-4';
+              leagueHeading.textContent = league;
+              leagueSection.appendChild(leagueHeading);
+              
+              const gamesGrid = document.createElement('div');
+              gamesGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+              
+              // Render only first 3 games for each league in the all view
+              const gamesToShow = data[league].slice(0, 3);
+              gamesToShow.forEach(game => {
+                gamesGrid.appendChild(createGameCard(game, league));
+              });
+              
+              leagueSection.appendChild(gamesGrid);
+              
+              if (data[league].length > 3) {
+                const viewMoreLink = document.createElement('a');
+                viewMoreLink.href = '#';
+                viewMoreLink.className = 'text-blue-600 hover:text-blue-800 mt-2 inline-block';
+                viewMoreLink.textContent = `View all ${data[league].length} ${league} games`;
+                viewMoreLink.onclick = function(e) {
+                  e.preventDefault();
+                  document.getElementById(league.toLowerCase() + '-tab').click();
+                };
+                leagueSection.appendChild(viewMoreLink);
+              }
+              
+              container.appendChild(leagueSection);
+            }
+          });
+        }
+        
+        function renderLeague(games, containerId, leagueName) {
+          const container = document.getElementById(containerId);
+          container.innerHTML = '';
+          
+          if (!games || games.length === 0) {
+            container.innerHTML = `<p class="text-center text-gray-500">No ${leagueName} games available at this time.</p>`;
+            return;
+          }
+          
+          const leagueHeading = document.createElement('h2');
+          leagueHeading.className = 'text-2xl font-bold mb-4';
+          leagueHeading.textContent = leagueName;
+          container.appendChild(leagueHeading);
+          
+          const gamesGrid = document.createElement('div');
+          gamesGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+          
+          games.forEach(game => {
+            gamesGrid.appendChild(createGameCard(game, leagueName));
+          });
+          
+          container.appendChild(gamesGrid);
+        }
+        
+        function createGameCard(game, league) {
+          const card = document.createElement('div');
+          card.className = 'game-card';
+          
+          // Format the date 
+          let gameDate = new Date(game.date);
+          let formattedDate = gameDate.toLocaleDateString() + ' ' + gameDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          
+          // Format the status with appropriate styling
+          let statusClass = '';
+          if (game.status === 'In Progress') {
+            statusClass = 'game-status-live';
+          } else if (game.status === 'Final') {
+            statusClass = 'game-status-final';
+          }
+          
+          card.innerHTML = `
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-500">${formattedDate}</span>
+              <span class="${statusClass} text-sm">${game.status}</span>
+            </div>
+            <div class="flex justify-between items-center mb-3">
+              <div class="font-bold">${game.away_team}</div>
+              <div>${game.away_score !== undefined ? game.away_score : '-'}</div>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+              <div class="font-bold">${game.home_team}</div>
+              <div>${game.home_score !== undefined ? game.home_score : '-'}</div>
+            </div>
+            <div class="border-t pt-3">
+              <div class="flex justify-between text-sm">
+                <div>
+                  <span class="text-gray-500">Away ML:</span>
+                  <span class="${parseInt(game.away_money_line) > 0 ? 'text-green-600' : 'text-red-600'}">${game.away_money_line}</span>
+                </div>
+                <div>
+                  <span class="text-gray-500">Home ML:</span>
+                  <span class="${parseInt(game.home_money_line) > 0 ? 'text-green-600' : 'text-red-600'}">${game.home_money_line}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          // Add click event listener for expanding odds after setting innerHTML
+          const showAllOddsBtn = card.querySelector('.show-all-odds');
+          if (showAllOddsBtn) {
+            showAllOddsBtn.addEventListener('click', function(e) {
+              const container = this.nextElementSibling;
+              const isHidden = container.classList.contains('hidden');
+              
+              container.classList.toggle('hidden');
+              this.textContent = isHidden ? 'Hide odds ▲' : 'Show all odds ▼';
+              e.stopPropagation();
+            });
+          }
+          
+          return card;
+        }
+      });
+    </script>
+  </body>
+</html>
