@@ -1,5 +1,6 @@
 import gameRoutes from './gameLog.js';
 
+
 const constructorMethod = (app) => {
   app.use('/gamelog', gameRoutes);
 
