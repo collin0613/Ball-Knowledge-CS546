@@ -30,7 +30,22 @@ Full project also have other HTML files, e.g.
         </h1>
     </header>
     <main>
-<!--       Implement   -->
+      <article>
+       <h2><span><em>League Selection:</em></span></h2>
+       <!--    
+        TODO: Implement links to league matchups.
+        I'm thinking, it should be done as a "submit" button for each league, and use handlebars to:
+        - process the button's id pressed
+        - link to matchups; should file paths be be views/matchups/<league>.handlebars?
+        - pull from only the corresponding league's DB branch 
+        - print each matchup of the day accordingly with a {{each }} function
+        - have a navigation back to homepage with league selection
+        --> 
+       <p><a href="">MLB</a></p>
+       <p><a href="">NBA</a></p>
+       <p><a href="">NHL</a></p>
+       <p><a href="">UFC</a></p>
+      </article>
     </main>
     <script src="/public/js/clientSide.js"></script>
 </body>
