@@ -37,6 +37,12 @@ Full project also have other HTML files, e.g.
         I'm thinking, it should be done as a "submit" button for each league, and use handlebars to:
         - process the button's id pressed
         - link to matchups; should file paths be be views/matchups/<id>.handlebars?
+            ~ Note: the routes/gameLog.js file currently has .route('/:id'); 
+            would 'id' be the DB id for that specific league?
+            would 'id' be the name of the league? -> 
+                 end up routing to league, by default gets all matchups, 
+                 can also .get a match by its :id, 
+                 and within that match id, .post a comment to it and .submit your pick
         - pull from only the corresponding league's DB branch 
         - print each matchup of the day accordingly with a {{each daily-game-in-league}} function
         - have a navigation back to homepage with league selection
