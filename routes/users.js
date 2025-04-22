@@ -44,10 +44,7 @@ router.route('/signup')
         userData.email,
         userData.username,
         userData.password,
-        userData.gender,
-        userData.city,
-        userData.state,
-        userData.age
+        userData.bio
 
       );
       
@@ -61,10 +58,7 @@ router.route('/signup')
         lastName: userData.lastName,
         email: userData.email,
         username: userData.username,
-        gender: userData.gender,
-        city: userData.city,
-        state: userData.state,
-        age: userData.age
+        bio: userData.bio,
       });
     }
   });

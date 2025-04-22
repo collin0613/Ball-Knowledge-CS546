@@ -6,12 +6,15 @@ export const createUser = async (
   email,
   username,
   password,
-  gender,
-  city,
-  state,
-  age
+  bio,
+  profileCustomization,
+  pickHistory,
+  friends,
+  creditBalance,
+  mmr,
+  rank
 ) => {
-  // Input validation
+  // input validation
   if (!firstName || !lastName || !email || !username || !password) {
     throw 'All required fields must be provided';
   }
@@ -22,19 +25,18 @@ export const createUser = async (
     throw 'Invalid input types';
   }
   
-  // Trim inputs
   firstName = firstName.trim();
   lastName = lastName.trim();
   email = email.trim().toLowerCase();
   username = username.trim().toLowerCase();
   
-  // Validate inputs
+  // validate inputs
   if (firstName.length < 2) throw 'First name must be at least 2 characters';
   if (lastName.length < 2) throw 'Last name must be at least 2 characters';
   if (username.length < 3) throw 'Username must be at least 3 characters';
   if (password.length < 6) throw 'Password must be at least 6 characters';
   
-  // Validate email format
+  // validate email format
   const hasAtSign = email.includes('@');
   const hasDotAfterAt = email.indexOf('.', email.indexOf('@')) > email.indexOf('@');
 
@@ -42,7 +44,7 @@ export const createUser = async (
     throw 'Invalid email format';
   }
   
-  // Check if username or email already exists
+  // check if username or email already exists
   const userCollection = await users();
   const existingUser = await userCollection.findOne({
     $or: [
@@ -72,12 +74,13 @@ export const createUser = async (
     email: email,
     username: username,
     hashedPassword: hashedPassword,
-    gender: gender,
-    city: city,
-    state: state,
-    age: age ? parseInt(age) : null,
-    usersPolls: [],
-    votedPolls: []
+    bio: bio,
+    profileCustomization: [],
+    pickHistory: [],
+    friends: [],
+    creditBalance: 1000,
+    mmr: 0,
+    rank: 'Unranked'
   };
   
   // insert
