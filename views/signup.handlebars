@@ -1,0 +1,78 @@
+<div class="signup-form">
+    <h2>Create your account</h2>
+    
+    <form id="signup-form" action="/account/signup" method="POST">
+        <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        
+        <!-- Optional fields -->
+        <div class="form-group">
+            <label for="gender">Gender (optional):</label>
+            <select id="gender" name="gender">
+                <option value="">-- Select --</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="nonbinary">Non-binary</option>
+                <option value="other">Other</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+                <option value="pathill">Pat-Hill</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="city">City (optional):</label>
+            <input type="text" id="city" name="city">
+        </div>
+        
+        <div class="form-group">
+            <label for="state">State (optional):</label>
+            <input type="text" id="state" name="state">
+        </div>
+        
+        <div class="form-group">
+            <label for="age">Age (optional):</label>
+            <input type="number" id="age" name="age" min="13" max="120">
+        </div>
+        
+        {{#if error}}
+            <div class="error-message">
+                {{error}}
+            </div>
+        {{/if}}
+        
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">Create Account</button>
+        </div>
+    </form>
+    
+    <div class="login-footer">
+        <p>Already have an account? <a href="/account/login">Log in</a></p>
+    </div>
+</div>

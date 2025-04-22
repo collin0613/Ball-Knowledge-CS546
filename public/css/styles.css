@@ -45,3 +45,8 @@ footer {
     font-family: "Brittle";
     font-style: italic;
 }
+
+.error-message {
+    color: red;
+    font-weight: bold;
+}
