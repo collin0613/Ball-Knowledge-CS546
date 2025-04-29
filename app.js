@@ -2,7 +2,13 @@ import express from 'express';
 import exphbs from 'express-handlebars';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import configRoutesFunction from './routes/index.js';
+import configRoutesFunction from './src/routes/index.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 
@@ -49,7 +55,7 @@ app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
-
+app.set('views', path.join(__dirname, 'src', 'views'));
 app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 

@@ -6,13 +6,13 @@ router.route('/')
   .get(async (req, res) => {
     // If user is already logged in
     if (req.session.user) {
-      return res.render('home', {
+      return res.render('homepage', {
         loggedIn: true, 
         user: req.session.user,
       });
     }
     try {
-      res.render('home', {
+      res.render('homepage', {
         loggedIn: false,
       });
     } catch (e) {

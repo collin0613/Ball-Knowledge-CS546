@@ -4,12 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:css": "npx tailwindcss -i ./src/style.css -o ./public/style.css",
-    "server": "node app.js",
-    "start": "concurrently \"npm run server\" \"npm run dev\"",
-    "preview": "vite preview"
+    "start": "node app.js"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.15",
