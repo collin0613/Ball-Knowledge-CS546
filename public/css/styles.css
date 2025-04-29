@@ -1,0 +1,52 @@
+/* Just copied in some basic CSS styles for now, can/should change as needed */
+* {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    font-size: 14pt;
+    font-family: "Brittle";
+  }
+
+body {
+    background-color: lightcyan;
+}
+
+header {
+    border-bottom: 2px solid #605f5f;
+    text-align: center;
+  }
+
+h1 {
+    font-size: 24px;
+    color: orange;
+}
+
+
+button.class {
+    background-color: greenyellow;
+}
+
+label.class {
+    font-family: 'Courier New';
+    font-style: small-caps;
+}
+
+p, input.error {
+    font-weight: bold;
+    color: darkred;
+}
+
+footer {
+    border-top: 2px solid #605f5f;
+    padding-top: 25px;
+    color: darkgoldenrod;
+    font-family: "Brittle";
+    font-style: italic;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+}
