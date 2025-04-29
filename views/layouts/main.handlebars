@@ -2,23 +2,105 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>My Site</title>
-    <link rel="stylesheet" href="/public/css/styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{#if title}}{{title}}{{else}}Ball Knowledge{{/if}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#3C3744',
+                        dark_hover: '#2C2734',
+                        dark_color: '#090C9B',
+                        light: '#FBFFF1',
+                        light_hover: '#ECECEC',
+                        light_color: '#B4C5E4',
+                        mid_color: '#3D52D5',
+                    },
+                    fontFamily: {
+                        main: ['Special Gothic Condensed One', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 20s linear infinite;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Gothic+Condensed+One&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-light overflow-x-hidden">
     <header>
-        <nav class = "center">
-               <a href="/" class="button">Home</a>
+        <nav class="bg-dark pt-5 pl-5 pr-5 pb-3 text-light fixed top-0 left-0 right-0 z-10 h-[80px]">
+            <div class="flex justify-between items-center">
+                <ul class="flex space-x-[50px]">
+                    <li>
+                        <a href="/" class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Home</a>
+                    </li>
+                    <li>
+                        <a href="/matchups" class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Matchups</a>
+                    </li>
+                    <li>
+                        <a href="/leaderboard"class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Leaderboard</a>
+                    </li>
+                    {{#if user}}
+                    <li>
+                        <a href="/profile" class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Profile</a>
+                    </li>
+                    <li>
+                        <a href="/account/logout" class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Logout</a>
+                    </li>
+                    {{else}}
+                    <li>
+                        <a href="/account/login" class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Login</a>
+                    </li>
+                    {{/if}}
+                </ul>
+                {{#unless user}}
+                <a href="/account/signup" class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Join Now</a>
+                {{/unless}}
+            </div>
         </nav>
+        <div
+            class="overflow-hidden whitespace-nowrap bg-dark_hover text-light py-2 fixed top-[80px] left-0 right-0 z-10">
+            <div class="w-max animate-marquee">
+                {{#if news}}
+                {{#each news}}
+                <span class="mx-8">{{this}}</span>
+                {{/each}}
+                {{else}}
+                <span class="mx-8">Lebron scores 50 points</span>
+                <span class="mx-8">Giannis blocks 3 shots</span>
+                <span class="mx-8">Luka scores 40 points</span>
+                <span class="mx-8">Jayson scores 30 points</span>
+                {{/if}}
+            </div>
+        </div>
     </header>
-    <divc class="container">
+    <main>
         {{{body}}}
-    </div>
-
-
-
+    </main>
+    <script src="/public/js/animations/parallax.js"></script>
+    <script src="/public/js/animations/lebronimation.js"></script>
+    <script src="/public/js/animations/jebronimation.js"></script>
+    <script src="/public/js/dots.js"></script>
 </body>
 
 </html>
