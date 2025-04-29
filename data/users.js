@@ -1,4 +1,5 @@
 import { users } from '../config/mongoCollections.js';
+import bcrypt from 'bcrypt';
 
 export const createUser = async (
   firstName,
@@ -64,8 +65,8 @@ export const createUser = async (
   
 
   
-  // for now, store the password directly
-  const hashedPassword = password;
+  // hash password
+  const hashedPassword = await bcrypt.hash(password, 16);
   
   // create new user object
   const newUser = {
@@ -99,3 +100,57 @@ export const createUser = async (
     username: username
   };
 };
+
+export const getUserById = async (userId) => {
+  if (!userId) throw 'You must provide an id to search for';
+  if (typeof userId !== 'string') throw 'Invalid id type';
+  
+  const userCollection = await users();
+  const user = await userCollection.findOne({ _id: userId });
+  
+  if (!user) {
+    throw 'No user found with that id';
+  }
+  
+  return {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    bio: user.bio,
+    profileCustomization: user.profileCustomization,
+    pickHistory: user.pickHistory,
+    friends: user.friends,
+    creditBalance: user.creditBalance,
+    mmr: user.mmr,
+    rank: user.rank,
+    username: user.username
+  };
+}
+
+export const getUserByUsername = async (username) => {
+  if (!username) throw 'You must provide a username to search for';
+  if (typeof username !== 'string') throw 'Invalid username type';
+  
+  const userCollection = await users();
+  const user = await userCollection.findOne({ username: username });
+  
+  if (!user) {
+    throw 'No user found with that username';
+  }
+  
+  return {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    username: user.username,
+    bio: user.bio,
+    profileCustomization: user.profileCustomization,
+    pickHistory: user.pickHistory,
+    friends: user.friends,
+    creditBalance: user.creditBalance,
+    mmr: user.mmr,
+    rank: user.rank
+  };
+}
