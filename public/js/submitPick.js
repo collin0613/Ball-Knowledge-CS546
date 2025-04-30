@@ -1,3 +1,4 @@
+
 (function () {
     const submitPickForm = document.getElementById('submitPickForm');
     const pickInput = document.getElementById('pickInput'); // In lab9, input was of type text, perhaps we have a "Pick This Team" button under every matchup instead of dealing with user text input of a team
