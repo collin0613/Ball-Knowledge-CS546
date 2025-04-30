@@ -1,0 +1,121 @@
+<style>
+  /* Leaderboard styles */
+  .leaderboard-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .leaderboard-list {
+    padding-left: 20px;
+    counter-reset: leaderboard-counter;
+  }
+
+  .leaderboard-item {
+    display: flex;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: relative;
+  }
+
+  .player-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+
+  .username {
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+
+  .stats {
+    display: flex;
+    gap: 15px;
+  }
+
+  .mmr, .rank {
+    color: #666;
+  }
+
+  /* Style for the numbers */
+  ol.leaderboard-list {
+    list-style-position: outside;
+    list-style-type: decimal;
+  }
+
+  /* Style the top 3 players differently */
+  .leaderboard-list li:nth-child(1) {
+    background-color: #fff9c4; /* Light gold */
+    border-left: 4px solid gold;
+  }
+
+  .leaderboard-list li:nth-child(2) {
+    background-color: #f5f5f5; /* Light silver */
+    border-left: 4px solid silver;
+  }
+
+  .leaderboard-list li:nth-child(3) {
+    background-color: #ffe0b2; /* Light bronze */
+    border-left: 4px solid #cd7f32; /* Bronze */
+  }
+
+  .navigation-links {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .navigation-links a {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #4285f4;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+
+  .navigation-links a:hover {
+    background-color: #3367d6;
+  }
+</style>
+
+<h1 class="text-4xl font-main text-center mb-6">Leaderboard</h1>
+
+{{#if loggedIn}}
+  <p class="text-center mb-6">Welcome, {{user.username}}!</p>
+{{else}}
+  <p class="text-center mb-6">Sign in to track your rank on the leaderboard!</p>
+{{/if}}
+
+<div class="leaderboard-container">
+  <h2 class="text-2xl font-main text-center mb-4">Top 10 Players</h2>
+  
+  {{#if leaderboard.length}}
+    <ol class="leaderboard-list">
+      {{#each leaderboard}}
+        <li class="leaderboard-item">
+          <div class="player-info">
+            <span class="username">{{this.username}}</span>
+            <span class="stats">
+              <span class="mmr">MMR: {{this.mmr}}</span>
+              <span class="rank">Rank: {{this.rank}}</span>
+            </span>
+          </div>
+        </li>
+      {{/each}}
+    </ol>
+  {{else}}
+    <p class="text-center text-gray-600">No players on the leaderboard yet!</p>
+  {{/if}}
+</div>
+
+<div class="navigation-links">
+  <a href="/">Back to Home</a>
+</div>
