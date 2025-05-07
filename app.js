@@ -6,11 +6,14 @@ import configRoutesFunction from './src/routes/index.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import MongoStore from 'connect-mongo';
+import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+dotenv.config();
 
 // set up static files middleware
 app.use('/public', express.static('public'));
@@ -29,8 +32,12 @@ app.use(
     secret: 'BallKnowledge',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 24 * 60 * 60,
+    }),
     cookie: {
-      maxAge: 60 * 60 * 1000 // 1 hour in milliseconds
+      maxAge: 60 * 60 * 1000
     }
   })
 );
