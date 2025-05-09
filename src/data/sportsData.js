@@ -14,20 +14,18 @@ const dateFormat = 'iso';
 
 //function that makes an API call to Odds API and gets a list of all in-season sports
 export const getInSeasonSports = async () => {
-
   try{
     const response = await axios.get('https://api.the-odds-api.com/v4/sports', {
       params: {
         apiKey: apiKey,
       }  
     });
-
     return response.data;
   }catch (e){
     console.error('Error status:', e.response?.status);
     console.error("Error response: ", e.response?.data || e.message);
     //not sure if this next line is needed?
-    throw e;
+    //throw e;
   }
   
 };
@@ -94,19 +92,41 @@ export const postOddsBySport = async (sportKey) => {
       const awayOdds = h2hMarket.outcomes.find(o => o.name === awayTeam)?.price;
       //error checking if odds are provided (why wouldnt it be provided?)
       if(homeOdds === undefined || awayOdds === undefined){
-        console.warn(`Skipping game ${game.id}: missing odds for home/way/both`);
+        console.warn(`Skipping game ${game.id}: missing odds for home/away/both`);
         continue;
       }
+      
+      let [startDateStr, startTimeStr] = game.commence_time.split('T');
+      startTimeStr = startTimeStr.substring(0, startTimeStr.length-1) // Removes the trailing 'Z' from time in the API's formatting
+      let utcString = startDateStr.concat(" ", startTimeStr);
+      const utcDate = new Date(utcString);
+      const estInMS = utcDate.getTime() - (60*60*1000*4); // Time given is not UTC. It's four hours ahead of EST. Subtracting that here
+      const estDate = new Date(estInMS); // Correct start time and date in EST as a Date(), rest is formatting for the string outputs 
+      let month = (estDate.getMonth() + 1).toString();
+      month = month.padStart(2, '0');
+      let day = estDate.getDate().toString();
+      day = day.padStart(2, '0');
+      const year = estDate.getFullYear();
+      let hour = estDate.getHours();
+      const minutes = estDate.getMinutes().toString().padStart(2, '0');
+      let ampm;
+      if (hour >= 12) { ampm='PM'; } else { ampm='AM'; }
+      hour = hour % 12;
+      if (hour === 0) hour=12;
+      hour = `${hour}`.padStart(2, '0');
+      const startDateStrEST = `${month}/${day}/${year}`;
+      const startTimeStrEST = `${hour}:${minutes} ${ampm} EST`;
 
       //defining the fields for our Games collection
       const singleGame = {
         uid: game.id,
         league: game.sport_title,
-        startTimeEST: game.commence_time,
-        homeTeam: homeTeam,
+        startDateEST: startDateStrEST, // Format: "MM/DD/YYYY"
+        startTimeEST: startTimeStrEST, // Format: "HH:MM AM/PM EST"
         awayTeam: awayTeam,
-        homeOdds: homeOdds, 
+        homeTeam: homeTeam,
         awayOdds: awayOdds,
+        homeOdds: homeOdds, 
         comments: [],
         totalPicks: 0,
         totalHomePicks: 0,
@@ -120,7 +140,7 @@ export const postOddsBySport = async (sportKey) => {
       const tryInsert = await gameCollection.findOne(
         {uid: game.uid}
       );
-      if(tryInsert){
+      if(!tryInsert){
         const insertInfo = await gameCollection.insertOne(game);
         if(!insertInfo.acknowledged || !insertInfo.insertedId) throw new Error(`Could not add game: ${game}`);
       }else{
@@ -128,10 +148,56 @@ export const postOddsBySport = async (sportKey) => {
       }
     }
     return insertGames;
-    
 
   }catch(e){
     console.error('Error status: ', e.response?.status);
     console.error('Error response: ', e.response?.data || e.message);
   }
 };
+
+export const geDBMatchesBySport = async (sportKey) => {
+  // TODO - implemnent getting matches through the DB (so we are not using API calls unnecessarily)
+  // should use when rendering leagueMatches, after we have called psotOddsBySport perhaps earlier in the session or day
+  try {
+    sportKey = validation.checkLeague(sportKey);
+  } catch(e) {
+    throw e;
+  }
+  try {
+    const gameCollection = await games();
+    if (!gameCollection) throw new Error("Could not fetch games from database.");
+    let futureLeagueGames;
+    const leagueStr = sportKey.substring(sportKey.length - 3).toUpperCase(); // 'icehockey_nhl' --> 'NHL', etc.
+    for (const game of gameCollection) {
+      if (game.league === leagueStr) {
+        // TODO: confirm game.startTimeEST is in future of current Date() and time before pushing to futureLeagueGames
+        let [gameDate, gameTimeEST] = game.startTimeEST.split('T');
+        futureLeagueGames.push(game);
+      }
+    }
+    return futureLeagueGames;
+  } catch (e) {
+    console.error('Error status: ', e.response?.status);
+    return [];
+  }
+}
+
+
+// Given a uid, finds and returns game info from a specific match in the games database
+export const getMatchByID = async (id) => {
+  try {
+    if (!id) throw new Error('No uid input submitted for getMatchByID()');
+    if (typeof id !== 'string') throw new Error('UID given was not of type string');
+    id = id.trim();
+    if (id.length === 0) throw new Error('uid inputted cannot be empty.');
+    const gameCollection = await games();
+    const foundMatch = await gameCollection.findOne({uid: id});
+    if (!foundMatch) throw new Error(`No game found with UID ${id}.`);
+    return foundMatch;
+  } catch (e) {
+    console.error('Error status: ', e.response?.status);
+    console.error('Error response: ', e.response?.data || e.message);
+    throw e;
+  }
+}
+

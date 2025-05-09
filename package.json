@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": "Josh Bekkerman, James Kaddissi, Tristan Mikiewicz, Collin Smith",
   "scripts": {
     "start": "node app.js"
   },
@@ -15,6 +16,7 @@
   },
   "dependencies": {
     "axios": "^1.8.4",
+    "bad-words": "^4.0.0",
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
