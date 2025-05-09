@@ -117,9 +117,14 @@ export const postOddsBySport = async (sportKey) => {
     const gameCollection = await games();
     for(const game of insertGames){
       //inserting each game into the Games collection one by one
-      const insertInfo = await gameCollection.insertOne(game);
-      if(!insertInfo.acknowledged || !insertInfo.insertedId){
-        throw new Error(`Could not add game: ${game.uid}`);
+      const tryInsert = await gameCollection.findOne(
+        {uid: game.uid}
+      );
+      if(tryInsert){
+        const insertInfo = await gameCollection.insertOne(game);
+        if(!insertInfo.acknowledged || !insertInfo.insertedId) throw new Error(`Could not add game: ${game}`);
+      }else{
+        continue;
       }
     }
     return insertGames;

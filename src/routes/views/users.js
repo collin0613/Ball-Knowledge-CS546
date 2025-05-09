@@ -166,5 +166,23 @@ router.route('/profile')
     }
   });
 
+  router.route('/profile/:username')
+  .get(async (req, res) => {
+    const username = req.params.username;
+    
+    try {
+      const user = await getUserByUsername(username);
+      
+      return res.render('profileID', {
+        title: `${username}'s Profile`,
+        user: user,
+      });
+    } catch (e) {
+      return res.status(404).render('error', {
+        error: 'User not found'
+      });
+    }
+  });
+
 export default router;
 
