@@ -3,38 +3,47 @@ import Filter from 'bad-words';
     const submitCommentForm = document.getElementById('postCommentForm');
     const commentInput = document.getElementById('commentInput');
     const errorMessage = document.getElementById('commentError');
+    
     if (submitCommentForm) {
-    submitCommentForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-    try {
-      if (commentInput.value.trim()) {
-        const comment = commentInput.value;
-        errorMessage.hidden = true;
-        try {
-            if (comment.length > 256) throw new Error(`Comment length: ${comment.length}/256`)
-        } catch(e) {
-            // Gets its own try-catch block so the comment input is not cleared upon exceeding length
-            errorMessage.hidden = false;
-            errorMessage.innerHTML = e;
-            commentInput.className = 'error';
-            commentInput.focus();
-            commentInput.className = 'inputClass'; 
-        }
-        const profanityFilter = new Filter();
-        if (profanityFilter.isProfane(comment)) throw new Error("Profanity was detected in your comment.");
-        submitCommentForm.submit();
-        // todo: add comment to game --> tried to implement in router post matchups/:league/:gameUID/submitComment (Collin)
-      } else {
-        throw new Error("You must provide a valid input");
-      }
-    } catch (e) {
-        commentInput.value = '';
-        errorMessage.hidden = false;
-        errorMessage.innerHTML = e;
-        commentInput.className = 'error';
-        commentInput.focus();
-        commentInput.className = 'inputClass'; 
-      }
-    });
+        submitCommentForm.addEventListener('submit', (event) => {
+            let isValid = true;
+            errorMessage.hidden = true;
+
+            if (!commentInput.value.trim()) {
+                errorMessage.hidden = false;
+                errorMessage.innerHTML = "You must provide a valid input";
+                commentInput.className = 'error';
+                commentInput.focus();
+                commentInput.className = 'inputClass'; 
+                isValid = false;
+            }
+            
+            if (commentInput.value.length > 256) {
+                errorMessage.hidden = false;
+                errorMessage.innerHTML = `Comment length: ${commentInput.value.length}/256`;
+                commentInput.className = 'error';
+                commentInput.focus();
+                commentInput.className = 'inputClass'; 
+                isValid = false;
+            }
+            
+            try {
+                const profanityFilter = new Filter();
+                if (profanityFilter.isProfane(commentInput.value)) {
+                    errorMessage.hidden = false;
+                    errorMessage.innerHTML = "Profanity was detected in your comment.";
+                    commentInput.className = 'error';
+                    commentInput.focus();
+                    commentInput.className = 'inputClass'; 
+                    isValid = false;
+                }
+            } catch (e) {
+                console.error("Error with profanity filter:", e);
+            }
+            
+            if (!isValid) { // changed to only prevent default if there is an inssue with validation
+                event.preventDefault();
+            }
+        });
     }
 })();
