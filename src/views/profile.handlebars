@@ -1,80 +1,52 @@
-<div class="profile-container">
-    <div class="profile-header">
-        <h1 class="profile-title">{{title}}</h1>
-        <div class="edit-toggle">
-            <button id="edit-toggle-button"
-                class="edit-toggle">
-                Edit Profile
-            </button>
-            <button id="save-button"
-                class="save-layout">
-                Save Layout
-            </button>
-        </div>
-    </div>
-
-    <div id="profile-content" class="profile-content">
-        <div class="profile-card" data-card-id="userInfo">
-            {{> cardheader title="User Info"}}
-            {{> cardcontent content=[
-                {
-                    label: "Username",
-                    value: user.username
-                },
-                {
-                    label: "Email", 
-                    value: user.email
-                }, 
-                {
-                    label: "First Name", 
-                    value: user.firstName
-                }, 
-                {
-                    label: "Last Name",
-                    value: user.lastName
-                }
-            ]}}
-        </div>
-
-        <div class="profile-card" data-card-id="bio">
-            {{> cardheader title="Bio"}}
-            {{> cardcontent content=[
-                {
-                    value: user.bio || "No bio available"
-                }
-            ]}}
-        </div>
-
-        <div class="profile-card" data-card-id="pickHistory">
-            {{> cardheader title="Pick History"}}
-            {{> listcontent items=user.pickHistory}}
-        </div>
-
-        <div class="profile-card" data-card-id="friends">
-            {{> cardheader title="Friends"}}
-            {{> listcontent items=user.friends}}
-        </div>
-
-        <div class="profile-card" data-card-id="stats">
-            {{> cardheader title="Stats"}}
-            {{> cardcontent content=[
-                {
-                    label: "Credit Balance:",
-                    value: user.creditBalance || "0"
-                },
-                {
-                    label: "MMR:",
-                    value: user.mmr || "0"
-                },
-                {
-                    label: "Rank:",
-                    value: user.rank || "Unranked"
-                },
-            ]}}
-        </div>
-    </div>
-</div>
-<link rel="stylesheet" href="/public/css/profile.css">
-<link rel="stylesheet" href="/public/css/card.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/Draggable.min.js"></script>
-<script src="/public/js/profile-customizer.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Page Editor</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    
+    #profile-editor {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Page Editor</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    
+    #profile-editor {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+  <div id="profile-editor"></div>
+  <script src="/public/js/components.js"></script>
+  <script src="/public/js/editor.js"></script>
+  <script src="/public/js/page-editor.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+</body>
+</html>

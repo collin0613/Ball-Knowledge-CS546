@@ -157,7 +157,7 @@ router.route('/profile')
       console.log('User data:', user);
       return res.render('profile', {
         title: 'Your Profile',
-        user: user,
+        user: user
       });
     } catch (e) {
       return res.status(500).render('error', {
