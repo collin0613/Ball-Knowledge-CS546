@@ -5,10 +5,26 @@
 <p>Your bio is: {{user.bio}}</p>
 <p>Your first name is: {{user.firstName}}</p>
 <p>Your last name is: {{user.lastName}}</p>
-<p> Your pick history: {{user.pickHistory}}</p>
-<p> Your friends: {{user.friends}}</p>
+{{!-- TODO: improve pickHistory display --}}
+<p> Your pick history: </p>
+<p>[FORMAT] MM/DD/YYYY,LEAGUE,TEAM,W/L/TBA,ODDS,WAGER,PAYOUT,MMR</p>
+<ul>
+    {{#each user.pickHistory}}
+        <li>
+            <p class="profilePick">{{this.pick}}</p>
+        </li>
+    {{/each}}
+</ul>
+<p> Your friends: {{user.friends.length}}</p>
+<ul>
+    {{#each user.friends}}
+        <li>
+            <p class="profileFriend">{{this}}</p>
+        </li>
+    {{/each}}
+</ul>
 <p> Your credit balance: {{user.creditBalance}}</p>
 <p> Your mmr: {{user.mmr}}</p>
 <p> Your rank: {{user.rank}}</p>
-
+<br>
 <p><a href="/account/logout">Click here to logout</a></p>

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import MongoStore from 'connect-mongo';
 import dotenv from 'dotenv';
+import { postOddsBySport } from './src/data/sportsData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,6 +66,7 @@ app.use((req, res, next) => {
 app.set('views', path.join(__dirname, 'src', 'views'));
 app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
+
 
 configRoutesFunction(app);
 

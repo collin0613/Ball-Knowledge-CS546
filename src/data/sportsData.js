@@ -92,7 +92,7 @@ export const postOddsBySport = async (sportKey) => {
       const awayOdds = h2hMarket.outcomes.find(o => o.name === awayTeam)?.price;
       //error checking if odds are provided (why wouldnt it be provided?)
       if(homeOdds === undefined || awayOdds === undefined){
-        console.warn(`Skipping game ${game.id}: missing odds for home/way/both`);
+        console.warn(`Skipping game ${game.id}: missing odds for home/away/both`);
         continue;
       }
       
@@ -140,7 +140,7 @@ export const postOddsBySport = async (sportKey) => {
       const tryInsert = await gameCollection.findOne(
         {uid: game.uid}
       );
-      if(tryInsert){
+      if(!tryInsert){
         const insertInfo = await gameCollection.insertOne(game);
         if(!insertInfo.acknowledged || !insertInfo.insertedId) throw new Error(`Could not add game: ${game}`);
       }else{
@@ -186,8 +186,12 @@ export const geDBMatchesBySport = async (sportKey) => {
 // Given a uid, finds and returns game info from a specific match in the games database
 export const getMatchByID = async (id) => {
   try {
+    if (!id) throw new Error('No uid input submitted for getMatchByID()');
+    if (typeof id !== 'string') throw new Error('UID given was not of type string');
+    id = id.trim();
+    if (id.length === 0) throw new Error('uid inputted cannot be empty.');
     const gameCollection = await games();
-    const foundMatch = gameCollection.findOne({uid: id});
+    const foundMatch = await gameCollection.findOne({uid: id});
     if (!foundMatch) throw new Error(`No game found with UID ${id}.`);
     return foundMatch;
   } catch (e) {
