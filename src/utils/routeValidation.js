@@ -12,9 +12,9 @@ const exportedMethods = {
       
     }
     return strVal;
-    
   }
+
 }
   
-  export default exportedMethods;
+export default exportedMethods;
   

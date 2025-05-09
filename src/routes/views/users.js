@@ -169,10 +169,10 @@ router.route('/profile')
     try {
       // get the user data from the database
       const user = await getUserByUsername(req.session.user.username);
-      
+      console.log('User data:', user);
       return res.render('profile', {
         title: 'Your Profile',
-        user: user,
+        user: user
       });
     } catch (e) {
       return res.status(500).render('error', {

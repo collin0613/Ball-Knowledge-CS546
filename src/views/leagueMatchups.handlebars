@@ -1,0 +1,12 @@
+<div class="leagueMatchups">
+    <h2 id="leagueHeader">{{leagueStr}}</h2>
+    <ul>
+        {{#each gameLogLeague}}
+            <br>
+            <li>
+                <a class="singleMatchLink" href="/matchups/{{../leaguePath}}/{{this.uid}}">{{this.awayTeam}} vs. {{this.homeTeam}}</a>
+                <p class="printStartTime">{{this.startDateEST}} {{this.startTimeEST}}</p>
+            </li>
+        {{/each}}
+    </ul>
+</div>

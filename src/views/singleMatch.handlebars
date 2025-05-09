@@ -1,0 +1,74 @@
+<div class="singleMatch">
+    <main>
+        <h2 id="matchHeader">{{awayTeam}} vs. {{homeTeam}}</h2>
+        <h3 id="linkLeagueMatchupsHeader"><a id="linkLeagueMatchups" href="/matchups/{{leaguePath}}">Back to {{leagueStr}} Matchups</a></h3>
+        <br>
+        <h4 id="oddsTitle">Odds:</h4>
+        <ul>
+            <li><p id="printAwayOdds">{{awayTeam}}: {{awayOddsStr}}</p></li>
+            <li><p id="printHomeOdds">{{homeTeam}}: {{homeOddsStr}}</p></li>
+            <br>
+        </ul>
+        {{!-- /
+        / todo: since we can't get total credits wagered from games db, unless we go through each users' pickHistory for games with same UID,
+        // we can't determine total percentage of credits wagered on each team and the percentages. I think it could be good to have that stat
+        // because you can put in a ton of 1-credit picks to skew the community pick %, should show what % of the total money wagered on each team too 
+        --}}
+        <article>
+            <h4>Community Picks: {{totalPicks}}</h4>
+            <ul>
+                <li><p id="awayCommunityPicks">{{awayTeam}}: {{totalAwayPicks}} ({{awayPickPercentage}}%)</p></li>
+                <li><p id="homeCommunityPicks">{{homeTeam}}: {{totalHomePicks}} ({{homePickPercentage}}%)</p></li>
+                <br>
+            </ul>
+        </article>
+
+        {{!-- Pick A Team --}}
+        <p id="pickError"></p>
+        <form action="/matchups/{{leaguePath}}/{{uid}}/submitPick" method="POST" id="submitPickForm">
+            <label class="pickTeamLabel" for="selectTeamPick">Pick A Team</label>
+            <select name="selectTeamPick" id="selectTeamPick" required>
+                <option value="" disabled selected hidden> * Select a Team *</option>
+                <option value="{{awayTeam}},{{awayOdds}},{{uid}}" id="optionAwayTeam">{{awayTeam}}: {{awayOddsStr}}</option>
+                <option value="{{homeTeam}},{{homeOdds}},{{uid}}" id="optionHomeTeam">{{homeTeam}}: {{homeOddsStr}}</option>
+            </select>
+            <input type="hidden" id="creditBalance" value="{{creditBalance}}">
+            <label class="creditsLabel" for="creditsInput">Credits:</label>
+            <input type="number" name="creditsInput" id="creditsInput" min="1" max="{{creditBalance}}" required>
+            <input type="hidden" id="creditBalance" value="{{creditBalance}}">
+            <input type="hidden" id="awayTeam" value="{{awayTeam}}">
+            <input type="hidden" id="homeTeam" value="{{homeTeam}}">
+            <input type="hidden" id="awayOdds" value="{{awayOdds}}">
+            <input type="hidden" id="homeOdds" value="{{homeOdds}}">
+            <br>
+            <button id="submitPickButton" type="submit">Submit Pick</button>
+            <br>
+            <button class="confirmForm" id="confirmSubmitPickButton" type="submit">Confirm Your Pick!</button>
+        </form>
+        <p id="pickMessage"></p> 
+        <br>
+
+        {{!-- Display Comment Thread --}}
+        <article>
+            <h4>Comments: {{comments.length}}</h4>
+            <ul id="commentList">
+                {{#each comments}}
+                    <li><p class="comment">{{this.author}}: {{this.message}}</p></li>
+                {{/each}}
+            </ul>
+        </article>
+
+        {{!-- Post a Comment --}}
+        <p id="commentError"></p>
+        <form action="/matchups/{{leaguePath}}/{{uid}}/submitComment" method="POST" id="postCommentForm">
+            <label id="commentLabel" for="commentInput">Write a comment:</label>
+            <input type="text" id="commentInput">
+            <br>
+            <button id="submitCommentButton" type="submit">Post Comment</button>
+        </form>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bad-words@3.0.4/lib/badwords.min.js"></script>
+    <script src="js/submitPick.js"></script>
+    <script src="js/submitComment.js"></script>
+</div>

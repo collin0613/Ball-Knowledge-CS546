@@ -1,5 +1,6 @@
 import { users } from '../config/mongoCollections.js';
 import bcrypt from 'bcrypt';
+import { ObjectId } from 'mongodb';
 
 export const createUser = async (
   firstName,
@@ -106,7 +107,7 @@ export const getUserById = async (userId) => {
   if (typeof userId !== 'string') throw 'Invalid id type';
   
   const userCollection = await users();
-  const user = await userCollection.findOne({ _id: userId });
+  const user = await userCollection.findOne({ _id: new ObjectId(userId) });
   
   if (!user) {
     throw 'No user found with that id';
