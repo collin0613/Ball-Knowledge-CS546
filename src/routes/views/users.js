@@ -115,8 +115,23 @@ router.route('/signup')
       if (userData.password !== userData.confirmPassword) {
         throw 'Passwords do not match';
       }
-      
-    
+      //check if username and email already exist in userrs collection
+      const userCollection = await users();
+      const existingUser = await userCollection.findOne({
+        $or: [
+          { username: userData.username },
+          { email: userData.email }
+        ]
+      });
+      if (existingUser) {
+        if (existingUser.username === userData.username) {
+          throw 'Username already exists';
+        }
+        if (existingUser.email === userData.email) {
+          throw 'Email already in use';
+        }
+      }
+     
       
       // call the createUser function from the data layer
       const newUser = await createUser(

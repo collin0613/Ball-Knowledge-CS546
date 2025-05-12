@@ -64,7 +64,15 @@ app.use((req, res, next) => {
   next();
 });
 app.set('views', path.join(__dirname, 'src', 'views'));
-app.engine('handlebars', exphbs.engine({defaultLayout: 'main', partialsDir: [path.join(__dirname, 'src', 'views', 'profile')]}));
+app.engine('handlebars', exphbs.engine({
+  defaultLayout: 'main', 
+  partialsDir: [path.join(__dirname, 'src', 'views', 'profile')],
+  helpers: {
+    ifEquals: function(arg1, arg2, options) {
+      return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+    },
+  }
+}));
 app.set('view engine', 'handlebars');
 
 
