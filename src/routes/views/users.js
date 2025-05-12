@@ -314,8 +314,10 @@ router.post('/addFriend', async (req, res) => {
 
   router.route('/profile/:username')
   .get(async (req, res) => {
+    if (!req.session.user) {
+      return res.redirect('/account/login');
+    }
     const username = req.params.username;
-    
     try {
       const user = await getUserByUsername(username);
       

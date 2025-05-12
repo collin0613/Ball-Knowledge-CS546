@@ -74,7 +74,6 @@ router
 
       let userId = user.userId;
       const userFound = await getUserById(userId);
-
       const credBal = userFound.creditBalance;
       const leaguePath = req.params.league;
       const leagueStr = leaguePath.substring(leaguePath.length - 3).toUpperCase().trim(); // "basketball_nba" --> "NBA", etc.
@@ -294,21 +293,6 @@ router.route('/matchups/:league/:gameUID/submitPick').post(async (req, res) => {
     }
 
     if (!updateInfo) throw new Error(`Failed to update pick info to game of uid ${uid}`);
-    // const gameComments = gameOfPick.comments;
-
-    // if (!gameComments) throw new Error("Unknown error: could not retrieve game comments");
-    // if (gameComments.length > 0) {
-    //   gameComments.forEach(gameComment => {
-    //       // TODO: if making comments a mongo collection, then need to change gameComment.teamPicked = teamName to mongo updateOne() 
-    //       // if (gameComment.author === user.username && (!gameComment.teamPicked)) gameComment.teamPicked = teamName;
-
-    //       // OR: if making comments each a string like pickHistory, then the following: 
-    //       // let [ id, author, comment, timeAuthoredEST, teamPicked ] = gameComment.split(',');
-    //       // if (author === user.username && (!teamPicked)) teamPicked = teamName;
-
-
-    //   });
-    // }
 
     return res.redirect(`/matchups/${league}/${gameUID}`);
 
