@@ -131,7 +131,6 @@ router.route('/signup')
           throw 'Email already in use';
         }
       }
-     
       
       // call the createUser function from the data layer
       const newUser = await createUser(
@@ -180,6 +179,132 @@ router.route('/profile')
       });
     }
   });
+
+router.route('/findUsers')
+  .get(async (req, res) => {
+    if (!req.session.user) {
+      return res.redirect('/account/login');
+    }
+    res.render('findUsers', { usersFound: null });
+  })
+  .post(async (req, res) => {
+    if (!req.session.user) {
+      return res.redirect('/account/login');
+    }
+
+    let searchTerm = req.body.usernameInput?.trim();
+    const currentUsername = req.session.user.username;
+    let usersFound = [];
+
+    if (!searchTerm) {
+      return res.status(400).render('findUsers', {
+        error: 'Search term input cannot be empty',
+        usersFound: []
+      });
+    }
+
+    try {
+      const userCollection = await users();
+      const allUsers = await userCollection.find({ username: { $ne: currentUsername } }).toArray(); // all users except current user
+      const searchTermLower = searchTerm.toLowerCase();
+      usersFound = allUsers.filter(u =>
+        u.username.includes(searchTermLower) // username INCLUDES searched term. findUsers for "jo" would return links to usernames "johnny", "jordan", "banjo", etc.
+      );
+      return res.render('findUsers', { usersFound });
+    } catch (e) {
+      return res.status(500).render('error', { error: e });
+    }
+  });
+
+router.post('/addFriend', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/account/login');
+  }
+  const currentUsername = req.session.user.username;
+  const friendUsername = req.body.friendUsername?.trim();
+  if (!friendUsername || currentUsername === friendUsername) return res.render('findUsers', { usersFound: [], friendError: 'Invalid friend request.'});
+  
+  try {
+    const userCollection = await users();
+    const currentUser = await userCollection.findOne({username: currentUsername});
+    let currentFriendRequests = currentUser.friendRequests;
+    if (!currentFriendRequests) return res.render('findUsers', { usersFound: [], friendError: "Could not receive current user's friend requests."});
+    let userFriendInfo;
+    let otherFriendInfo;
+    if (currentFriendRequests.length !== 0) {
+      currentFriendRequests.forEach(async requestUsername => {
+        // Case 1: current user sent a friend request to a user who has already sent them a friend request --> add each user to the other's friends list
+        if (requestUsername === friendUsername) { 
+          userFriendInfo = await userCollection.updateOne(
+            { username: currentUsername },
+            { 
+              $push: { friends: friendUsername }, // add friend to friends of current user
+              $pull: { friendRequests: friendUsername} // remove pending friend request from friend
+             }
+          );
+          otherFriendInfo = await userCollection.updateOne(
+            { username: friendUsername },
+            { 
+              $push: { friends: currentUsername }, // add current user to friends of friend
+              $pull: { friendRequests: currentUsername} // remove pending friend request from user
+             }
+          );
+          if (!userFriendInfo || !otherFriendInfo) return res.render('findUsers', { usersFound: [], friendError: `Could not successfully add user "${friendUsername}" as a friend.`});
+          
+          return res.render('findUsers', {
+            usersFound: [],
+            friendSuccess: `You successfully added "${friendUsername}" as a friend!` // return for friend added
+          });
+        }
+      });
+    }
+    // Case 2: current user is sending a friend request to a user who has not sent them a friend request --> add current user to friend's friendRequests list
+    if (!userFriendInfo && !otherFriendInfo) {
+      const friendUser = await userCollection.findOne({ username: friendUsername });
+      // confirm that the users are not already friends
+      let friendFriendsList = friendUser.friends;
+      let userFriendsList = currentUser.friends;
+      let alreadyFriends = false;
+      if (!friendFriendsList) return res.render('findUsers', { usersFound: [], friendError: `Could not receive friends of user "${friendUsername}".`});
+      friendFriendsList.forEach(friend => {
+        if (friend === currentUsername) alreadyFriends = true; // check both users' friends lists to confirm not already friends
+      });
+      userFriendsList.forEach(friend => {
+        if (friend === friendUsername) alreadyFriends = true; // check both users' friends lists to confirm not already friends
+      });
+      if (alreadyFriends) return res.render('findUsers', { usersFound: [], friendError: `You are already friends with "${friendUsername}"!`});
+      
+      // confirm that the current user does not already have a pending friend request to the friend user
+      let friendUserRequests = friendUser.friendRequests;
+      if (!friendUserRequests) return res.render('findUsers', { usersFound: [], friendError: `Could not receive friendRequests attribute for user "${friendUsername}".`});
+      let sentReqToFriend = false;
+      friendUserRequests.forEach(friendReqUsername => {
+        if (friendReqUsername === currentUsername) sentReqToFriend = true;
+      });
+      if (sentReqToFriend) return res.render('findUsers', { usersFound: [], friendError: `You already have a pending friend request sent to "${friendUsername}".`});
+
+      // add currentUser username to friend requests of other user
+      const requestAdded = await userCollection.updateOne(
+        { username: friendUsername },
+        { $push: { friendRequests: currentUsername } }
+      );
+      if (!requestAdded) return res.render('findUsers', { usersFound: [], friendError: `Could not successfully send a friend request to user "${friendUsername}".`});
+      let successMsg = `You successfully sent a friend request to "${friendUsername}".`;
+      return res.render('findUsers', {
+        usersFound: [],
+        friendSuccess: successMsg
+      });
+    }
+
+  } catch (e) {
+    return res.render('findUsers', {
+      usersFound: [],
+      friendError: 'Something went wrong. Please try again.'
+    });
+    
+  }
+});
+
 
   router.route('/profile/:username')
   .get(async (req, res) => {

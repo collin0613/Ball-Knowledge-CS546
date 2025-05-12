@@ -1,0 +1,44 @@
+<div class="findUsersPage">
+    <div class="navigation-links">
+    <nav>
+        <a href="/" class="nav-link">Back to Home</a><br>
+        <a href="/account/findUsers" class="nav-link">Find Another User</a><br>
+        <a href="/leaderboard" class="nav-link">Leaderboard</a><br>
+    </nav>
+    </div>
+
+    <main>
+        <br>
+        <form action="/account/findUsers" method="POST" id="findUsersForm">
+            <label for="usernameInput">Enter a username:</label>
+            <input type="text" id="usernameInput" name="usernameInput" required>
+            <br>
+            <button type="submit">Search for Users</button>
+        </form>
+
+        <p id="addFriendError" hidden class="errorMessage">{{friendError}}</p>
+        <p id="addFriendSuccess" hidden class="successMessage">{{friendSuccess}}</p>
+
+        {{#if usersFound.length}}
+        <article id="usersFoundContainer">
+            <br>
+            <h4>Users Found:</h4>
+            <ul>
+                {{#each usersFound}}
+                    <li class="usersFoundLI">
+                        <a href="/account/profile/{{this.username}}">{{this.username}}</a>
+
+                        <form action="/account/addFriend" method="POST" class="addFriendForm">
+                            <input type="hidden" name="friendUsername" value="{{this.username}}">
+                            <button class="addFriendButton" type="submit">Add Friend</button>
+                        </form>
+                        <br>
+                        
+                    </li>
+                {{/each}}
+            </ul>
+        </article>
+        {{/if}}
+    </main>
+
+</div>

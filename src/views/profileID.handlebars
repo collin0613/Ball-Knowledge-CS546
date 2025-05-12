@@ -13,6 +13,25 @@
           <p>{{user.bio}}</p>
         </div>
       {{/if}}
+
+      {{#if user.friends.length}}
+        <div class="profile-friends">
+          <h3>Friends:</h3>
+          <ul class="profile-friends-list">
+          {{#each user.friends}}
+            <li class="usersFoundLI">
+                <a href="/account/profile/{{this.username}}">{{this.username}}</a>
+                {{!-- Could possibly include addFriend button here? not totally necessary though --}}
+
+                {{!-- <form action="/account/addFriend" method="POST" class="addFriendForm">
+                    <input type="hidden" name="friendUsername" value="{{this.username}}">
+                    <button type="submit">Add Friend</button>
+                </form> --}}
+            </li>
+          {{/each}}
+          </ul>
+        </div>
+      {{/if}}
       
       <div class="profile-stats">
         <h3>Statistics</h3>

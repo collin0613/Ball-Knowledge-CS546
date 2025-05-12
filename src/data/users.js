@@ -12,6 +12,7 @@ export const createUser = async (
   profileCustomization,
   pickHistory,
   friends,
+  friendRequests,
   creditBalance,
   mmr,
   rank
@@ -63,9 +64,7 @@ export const createUser = async (
       throw 'Email already in use';
     }
   }
-  
-
-  
+    
   // hash password
   const hashedPassword = await bcrypt.hash(password, 16);
   
@@ -80,18 +79,16 @@ export const createUser = async (
     profileCustomization: [],
     pickHistory: [],
     friends: [],
+    friendRequests: [], // added 5/11: friend requests received by other users. Stores as array of usernames
     creditBalance: 1000,
     mmr: 0,
     rank: 'Unranked'
   };
   
-  // insert
   const insertInfo = await userCollection.insertOne(newUser);
-  
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
     throw 'Could not add user';
   }
-  
   
   return {
     _id: insertInfo.insertedId,

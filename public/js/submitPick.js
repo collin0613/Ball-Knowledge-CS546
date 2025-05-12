@@ -16,10 +16,10 @@
       if (selectTeamPick.value.trim()) {
         let teamOdds;
         let teamName;
-        if (event.srcElement[0][0].selected) { // selected option: optionAwayTeam
+        if (event.srcElement[0][1].selected) { // selected option: optionAwayTeam
           teamName = document.getElementById("awayTeam").value;
           teamOdds = document.getElementById("awayOdds").value;
-        } else if (event.srcElement[0][1].selected) { // selected option: optionHomeTeam
+        } else if (event.srcElement[0][2].selected) { // selected option: optionHomeTeam
           teamName = document.getElementById("homeTeam").value;
           teamOdds = document.getElementById("homeOdds").value;
         } else {
