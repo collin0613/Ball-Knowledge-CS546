@@ -1,7 +1,7 @@
 import {Router} from 'express';
 const router = Router();
 import validation from '../../utils/routeValidation.js';
-import {getInSeasonSports, getOddsBySport, postOddsBySport} from '../../data/sportsData.js'; //changed gamesData
+import {getInSeasonSports, getOddsBySport, postOddsBySport, getMatchResults} from '../../data/sportsData.js'; //changed gamesData
 
 // is this needed?
 
@@ -20,6 +20,19 @@ router
 
 
 
+router
+  .route('/results/:id')
+  .get(async (req, res) => {
+    try{
+      const league = req.params.id;
+      console.log(`league : ${league}`);
+      const gameResult = await getMatchResults(league);
+      console.log(`gameResult: gameResult`);
+      return res.json(gameResult);
+    }catch(e){
+      return res.status(500).send(e);
+    }
+  });
 
 //routing for getOddsBySport (pulling specific league from API)
 
@@ -40,5 +53,6 @@ router
     }
   });
 
+export default router;
 
-  export default router;
+
