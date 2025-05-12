@@ -49,7 +49,7 @@ router
 
 // Routing to display a unique game; user clicks a game link from displayed games in a league
 
-// TODO: middleware prevents GET /matchups for non-authenticated users
+// TODO middleware prevents GET /matchups for non-authenticated users
 router
   .route('/matchups/:league/:gameUID')
   .get(async (req, res) => {
@@ -385,11 +385,9 @@ router.route('/matchups/:league/:gameUID/submitComment').post(async (req, res) =
 
     return res.redirect(`/matchups/${req.params.league}/${req.params.gameUID}`);
   } catch (e) {
-    console.log("Error:", e);
-    return res.status(400).render('singleMatch', { error: e });
+    return res.status(400).render('singleMatch', {error: e});
   }
 });
-
-// todo: function to update games in DB with win/loss result (from api call?) and administer payouts to winning picks
-// games in db don't have a "result"/"winner" attribute currently may need to implement that if we can reliably get the data of which teams won past games (live scores?)
+  // todo: function to update games in DB with win/loss result (from api call?) and administer payouts to winning picks
+  // games in db don't have a "result"/"winner" attribute currently may need to implement that if we can reliably get the data of which teams won past games (live scores?)
 export default router;
