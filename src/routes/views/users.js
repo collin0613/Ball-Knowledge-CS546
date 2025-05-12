@@ -314,21 +314,26 @@ router.post('/addFriend', async (req, res) => {
 
   router.route('/profile/:username')
   .get(async (req, res) => {
-    if (!req.session.user) {
-      return res.redirect('/account/login');
-    }
-    const username = req.params.username;
     try {
+      const username = req.params.username;
       const user = await getUserByUsername(username);
       
-      return res.render('profileID', {
-        title: `${username}'s Profile`,
-        user: user,
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      return res.json({
+        username: user.username,
+        rank: user.rank,
+        mmr: user.mmr,
+        bio: user.bio || '',
+        friends: user.friends || [],
+        creditBalance: user.creditBalance,
+        pickHistory: user.pickHistory || []
       });
     } catch (e) {
-      return res.status(404).render('error', {
-        error: 'User not found'
-      });
+      console.error(e);
+      return res.status(500).json({ error: 'An error occurred while fetching profile data' });
     }
   });
 

@@ -9,6 +9,8 @@ import Filter from 'bad-words';
             let isValid = true;
             errorMessage.hidden = true;
 
+            console.log("Comment input value:", commentInput.value);
+
             if (!commentInput.value.trim()) {
                 errorMessage.hidden = false;
                 errorMessage.innerHTML = "You must provide a valid input";

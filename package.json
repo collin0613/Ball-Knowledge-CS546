@@ -1,7 +1,7 @@
 {
   "name": "cs546",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "author": "Josh Bekkerman, James Kaddissi, Tristan Mikiewicz, Collin Smith",
   "scripts": {
@@ -15,7 +15,6 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
-    "@balldontlie/sdk": "^1.2.2",
     "axios": "^1.8.4",
     "bad-words": "^4.0.0",
     "bcrypt": "^5.1.1",

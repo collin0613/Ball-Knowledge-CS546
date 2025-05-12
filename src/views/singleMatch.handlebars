@@ -1,19 +1,11 @@
 <div class="singleMatch">
     <main>
-        <h2 id="matchHeader">{{awayTeam}} vs. {{homeTeam}}</h2>
-        <h3 id="linkLeagueMatchupsHeader"><a id="linkLeagueMatchups" href="/matchups/{{leaguePath}}">Back to
+        <h2 id="matchHeader"><span style="color: {{awayTeamColor}};">{{awayTeam}}</span> vs. <span
+                style="color: {{homeTeamColor}};">{{homeTeam}}</span></h2>
+        <h3 id="linkLeagueMatchupsHeader" class="back-button"><a id="linkLeagueMatchups"
+                href="/matchups/{{leaguePath}}">Back to
                 {{leagueStr}} Matchups</a></h3>
         <br>
-        <h4 id="oddsTitle">Odds:</h4>
-        <ul>
-            <li>
-                <p id="printAwayOdds">{{awayTeam}}: {{awayOddsStr}}</p>
-            </li>
-            <li>
-                <p id="printHomeOdds">{{homeTeam}}: {{homeOddsStr}}</p>
-            </li>
-            <br>
-        </ul>
         {{!-- /
         / todo: since we can't get total credits wagered from games db, unless we go through each users' pickHistory for
         games with same UID,
@@ -23,39 +15,57 @@
         money wagered on each team too
         --}}
         <article>
-            <h4>Community Picks: {{totalPicks}}</h4>
-            <ul>
-                <li>
-                    <p id="awayCommunityPicks">{{awayTeam}}: {{totalAwayPicks}} ({{awayPickPercentage}}%)</p>
-                </li>
-                <li>
-                    <p id="homeCommunityPicks">{{homeTeam}}: {{totalHomePicks}} ({{homePickPercentage}}%)</p>
-                </li>
-                <br>
-            </ul>
+            <h4 class="total-picks">{{totalPicks}} Predictions Placed</h4>
         </article>
 
         {{!-- Pick A Team --}}
-        <p id="pickError"></p>
         <form action="/matchups/{{leaguePath}}/{{uid}}/submitPick" method="POST" id="submitPickForm">
-            <label class="pickTeamLabel" for="selectTeamPick">Pick A Team</label>
-            <select name="selectTeamPick" id="selectTeamPick" required>
-                <option value="" disabled selected hidden> * Select a Team *</option>
+            <div class="card-container">
+                <div class="team-card" id="awayTeamCard" data-value="{{awayTeam}},{{awayOdds}},{{uid}}" data-color="{{awayTeamColor}}">
+                    <div class="team-card-content">
+                        <div class="team-info-container">
+                            <div class="team-info">
+                                <span class="team-name" style="color: {{awayTeamColor}};">{{awayTeam}}</span>
+                                <span class="team-odds">{{awayOddsStr}}</span>
+                            </div>
+                            <div class="team-picks-container">
+                                <span class="team-picks">{{totalAwayPicks}} ({{awayPickPercentage}}%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card" id="homeTeamCard" data-value="{{homeTeam}},{{homeOdds}},{{uid}}" data-color="{{homeTeamColor}}">
+                    <div class="team-card-content">
+                        <div class="team-info-container">
+                            <div class="team-picks-container">
+                                <span class="team-picks">{{totalHomePicks}} ({{homePickPercentage}}%)</span>
+                            </div>
+                            <div class="team-info">
+                                <span class="team-name" style="color: {{homeTeamColor}};">{{homeTeam}}</span>
+                                <span class="team-odds">{{homeOddsStr}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <select name="selectTeamPick" id="selectTeamPick" required style="display: none;">
+                <option value="" disabled selected> * Select a Team *</option>
                 <option value="{{awayTeam}},{{awayOdds}},{{uid}}" id="optionAwayTeam">{{awayTeam}}: {{awayOddsStr}}
                 </option>
                 <option value="{{homeTeam}},{{homeOdds}},{{uid}}" id="optionHomeTeam">{{homeTeam}}: {{homeOddsStr}}
                 </option>
             </select>
             <input type="hidden" id="creditBalance" value="{{creditBalance}}">
-            <label class="creditsLabel" for="creditsInput">Credits:</label>
-            <input type="number" name="creditsInput" id="creditsInput" min="1" max="{{creditBalance}}" required>
+            <label class="creditsLabel" for="creditsInput">Your Wager</label>
+            <input type="number" name="creditsInput" id="creditsInput" class="creditsInput" min="1"
+                max="{{creditBalance}}" required>
             <input type="hidden" id="creditBalance" value="{{creditBalance}}">
             <input type="hidden" id="awayTeam" value="{{awayTeam}}">
             <input type="hidden" id="homeTeam" value="{{homeTeam}}">
             <input type="hidden" id="awayOdds" value="{{awayOdds}}">
             <input type="hidden" id="homeOdds" value="{{homeOdds}}">
             <br>
-            <button id="submitPickButton" type="submit">Submit Pick</button>
+            <button id="submitPickButton" class="submit-pick" type="submit">Submit Pick</button>
             <br>
             <button class="confirmForm" id="confirmSubmitPickButton" type="submit">Confirm Your Pick!</button>
         </form>
@@ -71,14 +81,14 @@
                     <p class="comment">
                         {{#if this.teamPicked}}
                         {{#ifEquals this.teamPicked ../homeTeam}}
-                            <span style="color: {{../homeTeamColor}}; font-weight: bold;">{{this.author}}</span>
+                        <span style="color: {{../homeTeamColor}}; font-weight: bold;">{{this.author}}</span>
                         {{else}}
-                            <span style="color: {{../awayTeamColor}}; font-weight: bold;">{{this.author}}</span>
+                        <span style="color: {{../awayTeamColor}}; font-weight: bold;">{{this.author}}</span>
                         {{/ifEquals}}
                         {{else}}
-                            <span style="font-weight: bold;">{{this.author}}</span>
+                        <span>{{this.author}}</span>
                         {{/if}}
-                        {{this.comment}}
+                        : {{this.comment}}
                     </p>
                 </li>
                 {{/each}}
@@ -89,7 +99,7 @@
         <p id="commentError"></p>
         <form action="/matchups/{{leaguePath}}/{{uid}}/submitComment" method="POST" id="postCommentForm">
             <label id="commentLabel" for="commentInput">Write a comment:</label>
-            <input type="text" id="commentInput" name="commentInput" required>
+            <input type="text" id="commentInput" name="commentInput" class="comment-input" required>
             <br>
             <button id="submitCommentButton" type="submit">Post Comment</button>
         </form>
@@ -100,103 +110,419 @@
     <script src="/public/js/submitComment.js"></script>
 </div>
 
-
-
 <style>
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    margin: 0;
-    padding: 2rem;
-    display: flex;
-    justify-content: center;
-}
+    @keyframes pulse-scale {
+        0% {
+            transform: scale(1.04);
+        }
+        50% {
+            transform: scale(1.08);
+        }
+        100% {
+            transform: scale(1.04);
+        }         
+    }
 
-.singleMatch main {
-    background: white;
-    padding: 2rem 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 700px;
-    text-align: left;
-}
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
 
-.singleMatch h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #2d3748;
-    font-family: 'Special Gothic Condensed One', sans-serif;
-}
+    .singleMatch {
+        width: 80%;
+        margin-top: 200px;
+        margin-left: auto;
+        margin-right: auto;
+        border: 3px solid #dddddd;
+        border-radius: 28px;
+        background-color: aliceblue;
+        box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 50px;
+    }
 
-.singleMatch h3 a {
-    font-size: 1rem;
-    text-decoration: none;
-    color: #667eea;
-    font-weight: 600;
-}
+    #matchHeader {
+        font-size: 30px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
 
-.singleMatch h3 a:hover {
-    text-decoration: underline;
-}
+    .total-picks {
+        font-size: 30px;
+        font-weight: bold;
+        text-align: left;
+        margin-bottom: 20px;
+        margin-left: 10%;
+    }
 
-.singleMatch h4 {
-    font-size: 1.2rem;
-    margin-top: 1.5rem;
-    color: #2d3748;
-    font-weight: bold;
-}
+    .card-container {
+        width: 90%;
+        display: flex;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+    }
 
-.singleMatch ul {
-    list-style-type: none;
-    padding-left: 0;
-}
+    .team-card {
+        border: 2px solid #dddddd;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        min-width: 0;
+    }
 
-.singleMatch li {
-    margin-bottom: 0.75rem;
-}
+    .creditsLabel {
+        display: block;
+        margin-top: 50px;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: 10%;
+        font-style: italic;
+    }
 
-#submitPickForm, #postCommentForm {
-    margin-top: 1.5rem;
-}
+    .creditsInput {
+        display: block;
+        width: 80%;
+        margin-left: 10%;
+        margin-bottom: 20px;
+        margin-top: 30px padding: 5px;
+        font-size: 16px;
+        border: 2px solid #dddddd;
+        padding-left: 10px;
+        padding-top: 8px;
+        padding-bottom: 6px;
+        border-radius: 18px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+        color: #333333;
+    }
 
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
+    .creditsInput:hover {
+        border-color: #bbbbbb;
+        background-color: #ffffff;
+    }
 
-select, input[type="number"], input[type="text"] {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-}
+    .creditsInput:focus {
+        outline: none;
+        border-color: #3445db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+        background-color: #ffffff;
+    }
 
-button {
-    background-color: #667eea;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: background-color 0.3s ease;
-}
+    #awayTeamCard {
+        border-radius: 8px 0 0 8px;
+        border-right: solid 2px #dddddd;
+    }
 
-button:hover {
-    background-color: #5a67d8;
-}
+    #homeTeamCard {
+        border-radius: 0 8px 8px 0;
+        border-left: solid 2px #dddddd;
+    }
 
-.comment {
-    background: #f5f5f5;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-}
+    .team-card:hover {
+        border-color: #bbb;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transform: scale(1.03);
+        background-color: aliceblue;
+    }
+
+    .team-card.selected {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        border-color: inherit;
+        background-color: currentColor;
+        z-index: 10;
+        animation: pulse-scale 3s ease-in-out infinite;
+    }
+
+    .back-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-top: 140px;
+        margin-left: 30px;
+        background-color: #8f8f8f;
+        border: 3px solid #515151;
+        border-radius: 28px;
+        padding: 5px;
+        color: #ffffff;
+    }
+    .submit-pick {
+        background-color: #cfcfcf;
+        border: 3px solid #515151;
+        border-radius: 28px;
+        padding: 5px;
+        color: #969696;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: 40%;
+        margin-bottom: 20px;
+        padding: 10px;
+        width: 20%;
+        transition: all 0.3s ease;
+    }
+    .submit-pick:hover:not([style*="cursor: not-allowed"]) {
+        opacity: 0.9;
+        transform: scale(1.03);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .submit-pick:active:not([style*="cursor: not-allowed"]) {
+        transform: scale(0.98);
+    }
+    .submit-pick.submit-disabled:hover,
+    .submit-pick[style*="cursor: not-allowed"]:hover {
+        background-color: #cacaca;
+        color: #8c8c8c;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    .team-card-content {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    #awayTeamCard .team-info-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .team-info-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    #awayTeamCard .team-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #awayTeamCard .team-picks-container {
+        margin-left: auto;
+        padding-left: 5px;
+    }
+
+    #homeTeamCard .team-info-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    #homeTeamCard .team-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+    }
+
+    #homeTeamCard .team-picks-container {
+        margin-right: auto;
+        padding-right: 5px;
+        text-align: right;
+    }
+
+    .team-name {
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 5px;
+        transition: all 0.2s ease;
+        text-wrap: balance;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        max-width: 100%;
+    }
+
+    .team-name.selected-text {
+        color: white !important;
+    }
+
+    .team-card .team-odds {
+        font-size: 16px;
+        color: #666666;
+        transition: all 0.2s ease;
+        font-style: italic !important;
+    }
+
+    .team-card .team-picks {
+        font-size: 16px;
+        color: #666666;
+        transition: all 0.2s ease;
+        font-style: italic !important;
+    }
+
+    .team-card.selected .team-odds,
+    .team-card.selected .team-picks {
+        color: white;
+        font-style: italic !important;
+    }
+    #commentList {
+        max-height: 200px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 2px solid #dddddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .comment-input {
+        width: 80%;
+        padding: 8px;
+        margin: 10px auto;
+        border: 2px solid #dddddd;
+        border-radius: 18px;
+        background-color: #f9f9f9;
+        color: #333333;
+        font-size: 16px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .comment-input:focus {
+        outline: none;
+        border-color: #3445db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+        background-color: #ffffff;
+    }
+
+    .confirmForm {
+        background-color: #cfcfcf;
+        border: 3px solid #515151;
+        border-radius: 28px;
+        padding: 10px;
+        color: #969696;
+        font-size: 20px;
+        font-weight: bold;
+        width: 20%;
+        margin: 20px auto;
+        display: block;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    .confirmForm:hover:not([style*="cursor: not-allowed"]) {
+        opacity: 0.9;
+        transform: scale(1.03);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .confirmForm:active:not([style*="cursor: not-allowed"]) {
+        transform: scale(0.98);
+    }
+
+    .confirmForm.confirm-disabled:hover,
+    .confirmForm[style*="cursor: not-allowed"]:hover {
+        background-color: #cacaca;
+        color: #8c8c8c;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
 </style>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const awayTeamCard = document.getElementById('awayTeamCard');
+    const homeTeamCard = document.getElementById('homeTeamCard');
+    const awayTeamName = awayTeamCard.querySelector('.team-name');
+    const homeTeamName = homeTeamCard.querySelector('.team-name');
+    const selectTeamPick = document.getElementById('selectTeamPick');
+    const totalPicks = {{ totalPicks }} || 0;
+    const awayPickPercentage = {{ awayPickPercentage }} || 50;
+    const homePickPercentage = {{ homePickPercentage }} || 50;
+
+    let selectedTeamColor = null;
+    function updateButton() {
+        if (selectedTeamColor && creditsInput.value) {
+            submitPickButton.style.backgroundColor = selectedTeamColor;
+            submitPickButton.style.color = '#ffffff';
+            submitPickButton.style.borderColor = '#ffffff';
+            submitPickButton.style.cursor = 'pointer';
+            submitPickButton.classList.remove('submit-disabled');
+        } else {
+            submitPickButton.style.backgroundColor = '#cfcfcf';
+            submitPickButton.style.color = '#969696';
+            submitPickButton.style.borderColor = '#515151';
+            submitPickButton.style.cursor = 'not-allowed';
+            submitPickButton.classList.add('submit-disabled');
+        }
+    }
+    function calculateCardWidths() {
+        let awayWidth = 50;
+        let homeWidth = 50;
+
+        if (totalPicks > 0) {
+            if (awayPickPercentage >= 99) {
+                awayWidth = 75;
+                homeWidth = 25;
+            }
+            else if (homePickPercentage >= 99) {
+                awayWidth = 25;
+                homeWidth = 75;
+            }
+            else {
+                awayWidth = 25 + (awayPickPercentage / 100) * 50;
+                homeWidth = 25 + (homePickPercentage / 100) * 50;
+
+                const total = awayWidth + homeWidth;
+                if (Math.abs(total - 100) > 0.1) {
+                    awayWidth = (awayWidth / total) * 100;
+                    homeWidth = (homeWidth / total) * 100;
+                }
+            }
+        }
+
+        awayTeamCard.style.width = `${awayWidth}%`;
+        homeTeamCard.style.width = `${homeWidth}%`;
+    }
+
+    calculateCardWidths();
+
+    function selectCard(card) {
+        awayTeamCard.classList.remove('selected');
+        homeTeamCard.classList.remove('selected');
+        awayTeamCard.style.borderColor = '#dddddd';
+        homeTeamCard.style.borderColor = '#dddddd';
+        awayTeamCard.style.backgroundColor = 'transparent';
+        homeTeamCard.style.backgroundColor = 'transparent';
+        awayTeamCard.querySelector('.team-name').classList.remove('selected-text');
+        homeTeamCard.querySelector('.team-name').classList.remove('selected-text');
+
+        card.classList.add('selected');
+        const teamColor = card.getAttribute('data-color');
+        selectedTeamColor = teamColor;
+        card.style.borderColor = teamColor;
+        card.style.backgroundColor = teamColor;
+        card.style.color = 'white';
+        const teamName = card.querySelector('.team-name');
+        teamName.classList.add('selected-text');
+
+        updateButton();
+        selectTeamPick.value = card.getAttribute('data-value');
+    }
+
+    awayTeamCard.addEventListener('click', function () {
+        selectCard(this, 'away');
+    });
+
+    homeTeamCard.addEventListener('click', function () {
+        selectCard(this, 'home');
+    });
+
+    const submitPickForm = document.getElementById('submitPickForm');
+    submitPickForm.addEventListener('submit', function (e) {
+        if (!selectTeamPick.value) {
+            e.preventDefault();
+        }
+    });
+    creditsInput.addEventListener('input', function () {
+        updateButton(); 
+    });
+});
+</script>

@@ -1,49 +1,255 @@
 <h1 class="page-title">Leaderboard</h1>
 
 {{#if loggedIn}}
-  <p class="welcome-message">Welcome, {{user.username}}!</p>
+<p class="welcome-message">Welcome, {{user.username}}!</p>
 {{else}}
-  <p class="welcome-message">Sign in to track your rank on the leaderboard!</p>
+<p class="welcome-message">Sign in to track your rank on the leaderboard!</p>
 {{/if}}
 
 <div class="leaderboard-container">
   <h2 class="section-title">Top 10 Players</h2>
-  
+
   {{#if leaderboard.length}}
-    <ol class="leaderboard-list">
-      {{#each leaderboard}}
-        <li class="leaderboard-item">
-          <a href="/account/profile/{{this.username}}" class="player-link">
-            <div class="player-info">
-              <span class="username">{{this.username}}</span>
-              <span class="stats">
-                <span class="mmr">MMR: {{this.mmr}}</span>
-                <span class="rank">Rank: {{this.rank}}</span>
-              </span>
-            </div>
-          </a>
-        </li>
-      {{/each}}
-    </ol>
+  <ol class="leaderboard-list">
+    {{#each leaderboard}}
+    <li class="leaderboard-item">
+      <a href="/account/profile/{{this.username}}" class="player-link">
+        <div class="player-info">
+          <span class="username">{{this.username}}</span>
+          <span class="stats">
+            <span class="mmr">MMR: {{this.mmr}}</span>
+            <span class="rank">Rank: {{this.rank}}</span>
+          </span>
+        </div>
+      </a>
+    </li>
+    {{/each}}
+  </ol>
   {{else}}
-    <p class="empty-message">No players on the leaderboard yet!</p>
+  <p class="empty-message">No players on the leaderboard yet!</p>
   {{/if}}
 </div>
 
 <div class="navigation-links">
   <a href="/">Back to Home</a>
 </div>
+<div id="profileModal" class="profile-modal">
+  <div class="profile-modal-content">
+    <span class="close-modal">&times;</span>
+    <div id="profileContent" class="profile-container">
+    </div>
+  </div>
+</div>
 
+<script>
 
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('profileModal');
+    const profileContent = document.getElementById('profileContent');
+    const closeBtn = document.querySelector('.close-modal');
 
+    const playerLinks = document.querySelectorAll('.player-link');
 
+    playerLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const username = this.getAttribute('href').split('/').pop();
 
+        fetch(`/account/profile/${username}`)
+          .then(response => response.json())
+          .then(data => {
+            profileContent.innerHTML = `
+            <h1 class="profile-title">${data.username}'s Profile</h1>
+            
+            <div class="profile-card">
+              <div class="profile-info">
+                <p class="profile-detail"><strong>Username:</strong> ${data.username}</p>
+                <p class="profile-detail"><strong>Rank:</strong> ${data.rank}</p>
+                <p class="profile-detail"><strong>MMR:</strong> ${data.mmr}</p>
+                
+                ${data.bio ? `
+                  <div class="profile-bio">
+                    <h3 class="section-title">About Me</h3>
+                    <p>${data.bio}</p>
+                  </div>
+                ` : ''}
 
+                ${data.friends && data.friends.length ? `
+                  <div class="profile-friends">
+                    <h3 class="section-title">Friends:</h3>
+                    <ul class="profile-friends-list">
+                      ${data.friends.map(friend => `
+                        <li class="friend-item">
+                          <a href="#" class="friend-link" data-username="${friend}">${friend}</a>
+                        </li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+                
+                <div class="profile-stats">
+                  <h3 class="section-title">Statistics</h3>
+                  <p><strong>Credit Balance:</strong> ${data.creditBalance}</p>
+                  <p><strong>Total Picks:</strong> ${data.pickHistory ? data.pickHistory.length : 0}</p>
+                </div>
+              </div>
+            </div>
+          `;
 
+            const friendLinks = document.querySelectorAll('.friend-link');
+            friendLinks.forEach(friendLink => {
+              friendLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                const friendUsername = this.getAttribute('data-username');
+                document.querySelector(`.player-link[href="/account/profile/${friendUsername}"]`).click();
+              });
+            });
 
+            modal.style.display = 'block';
+          })
+          .catch(error => {
+            console.error('Error fetching profile:', error);
+          });
+      });
+    });
 
+    closeBtn.addEventListener('click', function () {
+      modal.style.display = 'none';
+    });
 
+    window.addEventListener('click', function (event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
+</script>
 <style>
+  .profile-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.3s;
+  }
+
+  .profile-modal-content {
+    background-color: #f8f9fa;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s;
+    max-height: 90vh;
+    overflow-y: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .close-modal {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .close-modal:hover,
+  .close-modal:focus {
+    color: #555555;
+    text-decoration: none;
+  }
+
+  .profile-title {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .profile-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-detail {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+
+  .profile-bio,
+  .profile-friends,
+  .profile-stats {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #dddddd;
+  }
+
+  .profile-modal .section-title {
+    text-align: left;
+    font-size: 24px;
+    margin-bottom: 16px
+  }
+
+  .profile-friends-list {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .friend-item {
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+  }
+
+  .friend-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .friend-link {
+    text-decoration: none;
+    color: #4285f4;
+    font-weight: bold;
+  }
+
+  .friend-link:hover {
+    color: #3367d6;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
   /* Leaderboard styles */
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -53,14 +259,15 @@
     justify-content: center;
     height: 100vh;
     margin: 0;
-}
+  }
+
   .leaderboard-container {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
   .leaderboard-list {
@@ -74,16 +281,16 @@
     padding: 10px 15px;
     background-color: white;
     border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  
+
   .leaderboard-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
-  
+
   .player-link {
     text-decoration: none;
     color: inherit;
@@ -108,7 +315,8 @@
     gap: 15px;
   }
 
-  .mmr, .rank {
+  .mmr,
+  .rank {
     color: #666;
   }
 
@@ -120,18 +328,18 @@
 
   /* Style the top 3 players differently */
   .leaderboard-list li:nth-child(1) {
-    background-color: #fff9c4; 
+    background-color: #fff9c4;
     border-left: 4px solid gold;
   }
 
   .leaderboard-list li:nth-child(2) {
-    background-color: #efefef; 
+    background-color: #efefef;
     border-left: 4px solid silver;
   }
 
   .leaderboard-list li:nth-child(3) {
-    background-color: #ffe0b2; 
-    border-left: 4px solid #cd7f32; 
+    background-color: #ffe0b2;
+    border-left: 4px solid #cd7f32;
   }
 
   .navigation-links {
@@ -151,24 +359,24 @@
   .navigation-links a:hover {
     background-color: #3367d6;
   }
-  
+
   .page-title {
     font-size: 2rem;
     text-align: center;
     margin-bottom: 1.5rem;
   }
-  
+
   .welcome-message {
     text-align: center;
     margin-bottom: 1.5rem;
   }
-  
+
   .section-title {
     font-size: 1.5rem;
     text-align: center;
     margin-bottom: 1rem;
   }
-  
+
   .empty-message {
     text-align: center;
     color: #666;
