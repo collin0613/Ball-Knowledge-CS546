@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import {games} from '../config/mongoCollections.js';
+import {updatePicksOnGame} from './users.js';
 
 dotenv.config(); //loading .env file into process.env
 
@@ -332,6 +333,8 @@ export const updateMatches = async (resultsArray) => {
         );
         updatedCount++;
         matched = true;
+        const newGame = await gameCollection.findOne({_id: record._id});
+        updatePicksOnGame(newGame);// calls function that updates picks on this one game now that a result has been added
         break;
       }
     }
@@ -351,7 +354,7 @@ export const getMatchResults = async (league) => {
   let url;
   //creating the date string for YESTERDAY since the NHL API shows all upcoming games given a date. So calling https://api-web.nhle.com/v1/schedule/2025-05-11 will give you all games on 2025-05-11 and on, all of which have NOT ended yet. 
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setDate(yesterday.getDate() - 1); 
   const formatted = yesterday.toISOString().split('T')[0];
   //determine which API to call given the league. some are public and dont require a key (NHL), while some do (NBA)
   switch (league.toLowerCase()) {

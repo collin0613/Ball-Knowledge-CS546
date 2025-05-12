@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import MongoStore from 'connect-mongo';
 import dotenv from 'dotenv';
-import { postOddsBySport } from './src/data/sportsData.js';
+import { postOddsBySport, getMatchResults } from './src/data/sportsData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -75,9 +75,10 @@ app.engine('handlebars', exphbs.engine({
 }));
 app.set('view engine', 'handlebars');
 
+// let data = getMatchResults("mlb"); // check to make sure you go back enough days to check results, and that there is a game with one pick on it within that check and league
+// console.log(data);
 
 configRoutesFunction(app);
-
 
 app.listen(3000, () => {
   console.log("We've now got a server!");
