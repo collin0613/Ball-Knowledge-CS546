@@ -63,7 +63,13 @@ router.route('/login')
         userId: user._id.toString(),
         username: user.username,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        email: user.email,
+        bio: user.bio,
+        rank: user.rank,
+        mmr: user.mmr,
+        creditBalance: user.creditBalance,
+        friends: user.friends
       };
       
       return res.redirect('/');

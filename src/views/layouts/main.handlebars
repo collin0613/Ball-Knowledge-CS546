@@ -81,6 +81,12 @@
                 {{#unless user}}
                 <a href="/account/signup" class="font-main text-light text-[26px] hover:bg-dark_hover py-2 px-4 rounded-[10px] hover:text-light_hover transition-all duration-200">Join Now</a>
                 {{/unless}}
+                {{#if user}}
+                <div class="ml-auto text-light font-main text-xl whitespace-nowrap">
+                    Balance: <span class="font-semibold">{{user.creditBalance}}</span>
+                </div>
+                {{else}}
+  {{/if}}
             </div>
         </nav>
         <div

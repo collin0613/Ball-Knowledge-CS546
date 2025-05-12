@@ -76,7 +76,6 @@ router
       const userFound = await getUserById(userId);
 
       const credBal = userFound.creditBalance;
-      if (!credBal) throw new Error("Could not retreive creditBalance from user.");
       const leaguePath = req.params.league;
       const leagueStr = leaguePath.substring(leaguePath.length - 3).toUpperCase().trim(); // "basketball_nba" --> "NBA", etc.
 
