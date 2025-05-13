@@ -76,7 +76,7 @@ export const createUser = async (
     username: username,
     hashedPassword: hashedPassword,
     bio: bio,
-    profileCustomization: [],
+    profileCustomization: {},
     pickHistory: [],
     friends: [],
     friendRequests: [], // added 5/11: friend requests received by other users. Stores as array of usernames
@@ -225,3 +225,36 @@ export const updatePicksOnGame = async (game) => {
   }
   return updatedPicksArr;
 }
+
+export const saveProfileEditorState = async (username, editorState) => {
+  if (!username || !editorState) {
+    throw 'Username and editor state must be provided';
+  }
+  
+  const userCollection = await users();
+  const updateInfo = await userCollection.updateOne(
+    { username: username },
+    { $set: { profileCustomization: editorState } }
+  );
+  
+  if (!updateInfo.acknowledged) {
+    throw 'Could not update profile customization';
+  }
+  
+  return { success: true };
+};
+
+export const getProfileEditorState = async (username) => {
+  if (!username) {
+    throw 'Username must be provided';
+  }
+  
+  const userCollection = await users();
+  const user = await userCollection.findOne({ username: username });
+  
+  if (!user) {
+    throw 'No user found with that username';
+  }
+  
+  return user.profileCustomization || {};
+};

@@ -164,7 +164,7 @@ router.route('/signup')
   });
 
 // profile routes
-router.route('/profile')
+router.route('/profile/:username?')
   .get(async (req, res) => {
     // check if user is logged in
     if (!req.session.user) {
@@ -172,16 +172,26 @@ router.route('/profile')
     }
     
     try {
+      const targetUsername = req.session.user.username;
+      const isCurrentUser = targetUsername === req.session.user.username;
+      
       // get the user data from the database
-      const user = await getUserByUsername(req.session.user.username);
+      const user = await getUserByUsername(targetUsername);
       console.log('User data:', user);
+      if (!user) {
+        return res.status(404).render('error', {
+          error: 'User not found'
+        });
+      }
+
       return res.render('profile', {
-        title: 'Your Profile',
-        user: user
+        title: isCurrentUser ? 'Welcome Back' : `${targetUsername}'s Profile`,
+        user: user,
+        isCurrentUser: isCurrentUser
       });
-    } catch (e) {
-      return res.status(500).render('error', {
-        error: 'An error occurred while loading your profile.'
+    }  catch (e) {
+      return res.status(404).render('error', {
+        error: e.toString()
       });
     }
   });
@@ -312,7 +322,7 @@ router.post('/addFriend', async (req, res) => {
 });
 
 
-  router.route('/profile/:username')
+  router.route('/data/:username')
   .get(async (req, res) => {
     try {
       const username = req.params.username;

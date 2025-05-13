@@ -55,7 +55,7 @@
         e.preventDefault();
         const username = this.getAttribute('href').split('/').pop();
 
-        fetch(`/account/profile/${username}`)
+        fetch(`/account/data/${username}`)
           .then(response => response.json())
           .then(data => {
             profileContent.innerHTML = `
@@ -63,7 +63,7 @@
             
             <div class="profile-card">
               <div class="profile-info">
-                <p class="profile-detail"><strong>Username:</strong> ${data.username}</p>
+                <p class="profile-detail"><strong>Username:</strong><a href="/account/profile/${data.username}"> ${data.username}</a></p>
                 <p class="profile-detail"><strong>Rank:</strong> ${data.rank}</p>
                 <p class="profile-detail"><strong>MMR:</strong> ${data.mmr}</p>
                 

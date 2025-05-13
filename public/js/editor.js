@@ -869,7 +869,6 @@ class EditorInterfaceUI {
             <button id="undo" class="editor-button">Undo</button>
             <button id="redo" class="editor-button">Redo</button>
             <button id="save" class="editor-button">Save</button>
-            <button id="load" class="editor-button">Load</button>
         `;
 
         const editModeToggle = this.toolbar.querySelector('#edit-mode-toggle');
@@ -898,8 +897,6 @@ class EditorInterfaceUI {
         redoButton.addEventListener('click', () => this.state.redo());
         const saveButton = this.toolbar.querySelector('#save');
         saveButton.addEventListener('click', () => this.save());
-        const loadButton = this.toolbar.querySelector('#load');
-        loadButton.addEventListener('click', () => this.load());
     }
 
     initComponents() {

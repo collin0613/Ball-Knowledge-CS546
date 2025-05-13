@@ -1,0 +1,67 @@
+import {Router} from 'express';
+const router = Router();
+import { getProfileEditorState, saveProfileEditorState } from '../../data/users.js';
+
+router.route('/:username').get(async (req, res) => {
+    try {
+        const username = req.params.username;
+        
+        const user = await getUserByUsername(username);
+        
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+        
+        return res.json({
+          username: user.username,
+          rank: user.rank,
+          mmr: user.mmr,
+          bio: user.bio || '',
+          friends: user.friends || [],
+          creditBalance: user.creditBalance,
+          pickHistory: user.pickHistory || []
+        });
+      } catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: e.toString() });
+      }
+});
+
+router.route('/save-state').post(async (req, res) => {
+    try {
+        if(!req.session.user) {
+            return res.status(401).json({error: 'User not logged in'});
+        }
+
+        console.log('Session:', req.session);
+
+        const username = req.session.user.username;
+        const editorState = req.body;
+
+        if (!editorState || typeof editorState !== 'object') {
+            return res.status(400).json({ error: 'Invalid editor state' });
+        }
+        console.log('Editor state:', editorState);
+        await saveProfileEditorState(username, editorState);
+        console.log('Editor state saved:', editorState);
+        return res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: e.toString() });
+    }
+});
+
+router.route('/get-state/:username').get(async (req, res) => {
+    try {
+      const username = req.params.username;
+      
+      const editorState = await getProfileEditorState(username);
+      
+      return res.json(editorState);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ error: e.toString() });
+    }
+  });
+
+export default router;

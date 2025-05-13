@@ -434,8 +434,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const homeTeamName = homeTeamCard.querySelector('.team-name');
     const selectTeamPick = document.getElementById('selectTeamPick');
     const totalPicks = {{ totalPicks }} || 0;
-    const awayPickPercentage = {{ awayPickPercentage }} || 50;
-    const homePickPercentage = {{ homePickPercentage }} || 50;
+    const awayPickPercentage = Math.round({{awayPickPercentage}} * 10) / 10 || 50;
+    const homePickPercentage = Math.round({{homePickPercentage}} * 10) / 10 || 50;
 
     let selectedTeamColor = null;
     function updateButton() {
