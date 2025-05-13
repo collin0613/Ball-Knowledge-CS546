@@ -172,7 +172,7 @@ router.route('/profile/:username?')
     }
     
     try {
-      const targetUsername = req.session.user.username;
+      const targetUsername = req.params.username || req.session.user.username;
       const isCurrentUser = targetUsername === req.session.user.username;
       
       // get the user data from the database
