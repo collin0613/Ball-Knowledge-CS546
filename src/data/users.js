@@ -258,3 +258,21 @@ export const getProfileEditorState = async (username) => {
   
   return user.profileCustomization || {};
 };
+
+export const updateUserMMR = async (username, newMMR) => {
+  if (!username || !newMMR) {
+    throw 'Username and new MMR must be provided';
+  }
+  
+  const userCollection = await users();
+  const updateInfo = await userCollection.updateOne(
+    { username: username },
+    { $set: { mmr: newMMR } }
+  );
+  
+  if (!updateInfo.acknowledged) {
+    throw 'Could not update user MMR';
+  }
+  
+  return { success: true };
+}
