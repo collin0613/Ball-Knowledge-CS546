@@ -301,6 +301,77 @@ router.route('/matchups/:league/:gameUID/submitPick').post(async (req, res) => {
   }
 });
 
+router.route('/matchups/:league/:gameUID/submitComment').post(async (req, res) => {
+  try {
+    // possibly might be commentMessage.value instead of just commentMessage;
+    // or if commentMessage.id !== 'commentInput'/'postCommentForm' (if it's failing at all)?
+    console.log("Entered POST /matchups/:league/:gameUID/submitComment router.");
+    let commentMessage = req.body.commentInput;
+    if (!commentMessage) throw new Error("You must provide a valid comment message.");
+    if (typeof commentMessage !== 'string') throw new Error('Unknown error: commentMessage is not of type string.');
+    commentMessage = commentMessage.trim();
+    if (commentMessage.length === 0) throw new Error("Comment message cannot be empty.");
+    const user = req.session.user;
+    if (!user) throw new Error("User not found in the session.");
+    const authorStr = user.username;
+    if (!authorStr) throw new Error("Could not retrieve current user's username for comment.");
+    if (typeof authorStr !== 'string') throw new Error('Unknown error: username is not of type string.');
+    const gameCollection = await games();
+    const gameFound = await gameCollection.findOne({ uid: req.params.gameUID });
+    if (!gameFound) throw new Error(`Game with UID ${req.params.gameUID} not found`);
+    const gameFoundUID = gameFound.uid;
+    console.log("Found game:", gameFoundUID);
+    if (!gameFound.comments) {
+      await gameCollection.updateOne(
+        { uid: gameFoundUID },
+        { $set: { comments: [] } }
+      );
+      console.log("Initialized comments array");
+    }
+    const userCollection = await users();
+    const userId = new ObjectId(user.userId);
+    if (!userId) throw new Error("userId not found");
+    const userFound = await userCollection.findOne({ _id: userId });
+    let teamNamePicked = '';
+    if (!userFound) throw new Error('Could not find user in users database');
+    const userPickHistory = userFound.pickHistory;
+    if (!userPickHistory) throw new Error("Could not retrieve user pickHistory.");
+    if (userPickHistory.length > 0) {
+      userPickHistory.forEach(userPick => {
+        const [_startDateEST, _league, _teamName, _result, _odds, _wager, _potentialPayout, _mmr] = userPick.pick.split(',');
+        if (_startDateEST === gameFound.startDateEST && (_teamName === gameFound.awayTeam || _teamName === gameFound.homeTeam) && gameFound.totalPicks > 0) {
+          teamNamePicked = _teamName;
+        }
+      });
+    }
+    const commentObj = {
+      author: authorStr,
+      comment: commentMessage,
+      timeAuthoredEST: (new Date()).toLocaleTimeString('en-US', { timeZone: 'America/New_York' })
+    };
+
+    if (teamNamePicked.length > 0) {
+      commentObj.teamPicked = teamNamePicked;
+    }
+
+    console.log("Adding comment:", commentObj);
+    const gameUpdateInfo = await gameCollection.updateOne(
+      { uid: gameFoundUID },
+      { $push: { comments: commentObj } }
+    );
+
+    console.log("Comment result:", gameUpdateInfo);
+
+    if (!gameUpdateInfo.modifiedCount || gameUpdateInfo.modifiedCount === 0) {
+      console.log("Error modifying comment in game");
+    }
+
+    return res.redirect(`/matchups/${req.params.league}/${req.params.gameUID}`);
+  } catch (e) {
+    return res.status(400).render('singleMatch', {error: e});
+  }
+});
+
 
   // todo: function to update games in DB with win/loss result (from api call?) and administer payouts to winning picks
   // games in db don't have a "result"/"winner" attribute currently may need to implement that if we can reliably get the data of which teams won past games (live scores?)

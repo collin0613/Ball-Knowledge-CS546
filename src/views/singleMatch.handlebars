@@ -425,7 +425,6 @@
     }
 </style>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const awayTeamCard = document.getElementById('awayTeamCard');
@@ -433,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const awayTeamName = awayTeamCard.querySelector('.team-name');
     const homeTeamName = homeTeamCard.querySelector('.team-name');
     const selectTeamPick = document.getElementById('selectTeamPick');
-    const totalPicks = {{ totalPicks }} || 0;
+    const totalPicks = {{totalPicks}} || 0;
     const awayPickPercentage = Math.round({{awayPickPercentage}} * 10) / 10 || 50;
     const homePickPercentage = Math.round({{homePickPercentage}} * 10) / 10 || 50;
 
@@ -523,6 +522,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     creditsInput.addEventListener('input', function () {
         updateButton(); 
+    });
+    
+    const submitButton = document.getElementById('submitPickButton');
+    const confirmButton = document.getElementById('confirmSubmitPickButton');
+    confirmButton.style.display = 'none';
+    
+    submitButton.addEventListener('click', function(e) {
+        if (!submitButton.classList.contains('submit-disabled')) {
+            e.preventDefault();
+            
+            submitButton.style.display = 'none';
+            confirmButton.style.display = 'block';
+            
+            confirmButton.style.backgroundColor = selectedTeamColor;
+            confirmButton.style.color = '#ffffff';
+            confirmButton.style.borderColor = '#ffffff';
+            confirmButton.style.cursor = 'pointer';
+        }
     });
 });
 </script>
