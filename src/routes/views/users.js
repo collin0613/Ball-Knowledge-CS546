@@ -3,7 +3,8 @@ const router = Router();
 import { createUser, getUserById, getUserByUsername } from '../../data/users.js'; 
 import bcrypt from 'bcrypt';
 import {users} from '../../config/mongoCollections.js';
-
+import xss from 'xss';
+//safe from xss attacks
 //render login page
 router.route('/login')
   .get(async (req, res) => {
@@ -20,7 +21,8 @@ router.route('/login')
     }
   })
   .post(async (req, res) => {
-    const { username, password } = req.body;
+    const username = xss(req.body.username || '');
+    const password = xss(req.body.password || '');
     
     // Input validation
     try {
@@ -110,7 +112,15 @@ router.route('/signup')
     }
   })
   .post(async (req, res) => {
-    const userData = req.body;
+    const userData = {
+      firstName: xss(req.body.firstName || ''),
+      lastName: xss(req.body.lastName || ''),
+      email: xss(req.body.email || ''),
+      username: xss(req.body.username || ''),
+      password: xss(req.body.password || ''),
+      confirmPassword: xss(req.body.confirmPassword || ''),
+      bio: xss(req.body.bio || '')
+    };
     try {
       if (!userData.firstName || !userData.lastName || !userData.email || 
           !userData.username || !userData.password || !userData.confirmPassword) {
@@ -208,7 +218,7 @@ router.route('/findUsers')
       return res.redirect('/account/login');
     }
 
-    let searchTerm = req.body.usernameInput?.trim();
+    let searchTerm = xss(req.body.usernameInput?.trim() || '');
     const currentUsername = req.session.user.username;
     let usersFound = [];
 
@@ -237,7 +247,7 @@ router.post('/addFriend', async (req, res) => {
     return res.redirect('/account/login');
   }
   const currentUsername = req.session.user.username;
-  const friendUsername = req.body.friendUsername?.trim();
+  const friendUsername = xss(req.body.friendUsername?.trim() || '');
   if (!friendUsername || currentUsername === friendUsername) return res.render('findUsers', { usersFound: [], friendError: 'Invalid friend request.'});
   
   try {
@@ -333,7 +343,7 @@ router.post('/addFriend', async (req, res) => {
       }
       
       return res.json({
-        username: user.username,
+        username: xss(user.username),
         rank: user.rank,
         mmr: user.mmr,
         bio: user.bio || '',

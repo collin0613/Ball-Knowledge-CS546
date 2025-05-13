@@ -9,7 +9,8 @@ import { getUserById } from '../../data/users.js';
 import { games } from '../../config/mongoCollections.js';
 import { comment } from 'postcss';
 import { Filter } from 'bad-words';
-
+import xss from 'xss';
+//safe from xss attacks
 
 router
   .route('/matchups')
@@ -210,10 +211,10 @@ router
 
 router.route('/matchups/:league/:gameUID/submitPick').post(async (req, res) => {
   try {
-    const teamPick = req.body.selectTeamPick;
+    const teamPick = xss(req.body.selectTeamPick);
     const [teamName, oddsStr, gameUID] = teamPick.split(',');
-    const creditAmount = Number(req.body.creditsInput);
-    let league = (req.params.league);
+    const creditAmount = xss(Number(req.body.creditsInput));
+    let league = xss((req.params.league));
     if (!teamPick || !creditAmount) throw new Error('Unexpected error: missing teamPick and/or creditAmount.')
     const wager = parseInt(creditAmount);
     let odds = oddsStr;
@@ -306,7 +307,7 @@ router.route('/matchups/:league/:gameUID/submitComment').post(async (req, res) =
     // possibly might be commentMessage.value instead of just commentMessage;
     // or if commentMessage.id !== 'commentInput'/'postCommentForm' (if it's failing at all)?
     console.log("Entered POST /matchups/:league/:gameUID/submitComment router.");
-    let commentMessage = req.body.commentInput;
+    let commentMessage = xss(req.body.commentInput);
     if (!commentMessage) throw new Error("You must provide a valid comment message.");
     if (typeof commentMessage !== 'string') throw new Error('Unknown error: commentMessage is not of type string.');
     commentMessage = commentMessage.trim();

@@ -27,7 +27,6 @@ router
       const league = req.params.id;
       console.log(`league : ${league}`);
       const gameResult = await getMatchResults(league);
-      console.log(`gameResult: gameResult`);
       return res.json(gameResult);
     }catch(e){
       return res.status(500).send(e);
