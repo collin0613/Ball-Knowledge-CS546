@@ -85,94 +85,40 @@ class ProfileEditor {
         })
         .catch(error => {
             console.error('Error loading profile:', error);
-            this.initDefaultContent();
             this.setMode(this.isCurrentUser);
         });
     }
 
     initDefaultContent() {
+        const username = this.username || 'User';
+        
+        const userData = {
+            username: username,
+            mmr: 0,
+            rank: 'Unranked',
+            creditBalance: 0,
+            friends: [],
+            pickHistory: [],
+            bio: 'Welcome to your profile!'
+        };
+        
+        this.userData = userData;
+        
         const welcomeCard = new Card({
             left: 50,
             top: 50,
             width: 700,
             height: 150,
             title: `${username}'s Profile`,
-            content: bio ? bio : 'Welcome to your profile! This is a customizable space where you can share whatever you want.',
-            userData: this.userData,
+            content: `Welcome to {{username}}'s profile! MMR: {{mmr}}, Rank: {{rank}}`,
+            userData: userData,
             headerBGColor: '#4285f4',
             headerTextColor: '#ffffff',
             contentColor: '#333333'
         });
+
         this.state.newComponent(welcomeCard);
         welcomeCard.render(this.ui.canvas);
-        const statsCard = new Card({
-            left: 50,
-            top: 220,
-            width: 340,
-            height: 230,
-            title: 'My Stats',
-            content: `MMR: ${mmr || 0}\nRank: ${rank || 'Unranked'}\nCredit Balance: ${creditBalance || 0}\nTotal Picks: ${pickHistory ? pickHistory.length : 0}`,
-            userData: this.userData,
-            headerBGColor: '#3f51b5',
-            headerTextColor: '#ffffff',
-            contentColor: '#333333'
-        });
-        this.state.newComponent(statsCard);
-        statsCard.render(this.ui.canvas);
-
-        const friendsCard = new Card({
-            left: 410,
-            top: 220,
-            width: 340,
-            height: 230,
-            title: 'My Friends',
-            content: this.formatFriendsList(friends),
-            userData: this.userData,
-            headerBGColor: '#e91e63',
-            headerTextColor: '#ffffff',
-            contentColor: '#333333'
-        });
-        this.state.newComponent(friendsCard);
-        friendsCard.render(this.ui.canvas);
-
-        if (pickHistory && pickHistory.length > 0) {
-            const pickHistoryCard = new Card({
-                left: 50,
-                top: 470,
-                width: 700,
-                height: 250,
-                title: 'Recent Picks',
-                content: this.formatPickHistory(pickHistory),
-                userData: this.userData,
-                headerBGColor: '#795548',
-                headerTextColor: '#ffffff',
-                contentColor: '#333333'
-            });
-            this.state.newComponent(pickHistoryCard);
-            pickHistoryCard.render(this.ui.canvas);
-        }
-    }
-    formatFriendsList(friends) {
-        if (!friends || !friends.length) return 'No friends yet';
-        
-        return friends.slice(0, 10).map(friend => `• ${friend}`).join('\n') + 
-               (friends.length > 10 ? `\n... and ${friends.length - 10} more` : '');
-    }
-    formatPickHistory(pickHistory) {
-        if (!pickHistory || !pickHistory.length) return 'No picks yet';
-        
-        return pickHistory.slice(0, 5).map(pick => {
-            if (pick && pick.pick) {
-                const parts = pick.pick.split(',');
-                if (parts.length >= 4) {
-                    const date = parts[0];
-                    const team = parts[2];
-                    const result = parts[3];
-                    return `• ${date} - ${team}: ${result}`;
-                }
-            }
-            return '• Unknown pick';
-        }).join('\n') + (pickHistory.length > 5 ? `\n... and ${pickHistory.length - 5} more` : '');
     }
 }
 

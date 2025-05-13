@@ -13,6 +13,8 @@ class CustomComponent {
         this.borderWidth = config.borderWidth || 1;
         this.boxShadow = config.boxShadow || '0 2px 4px rgba(0,0,0,0.1)';
         this.opacity = config.opacity || 1;
+        this.textAlign = config.textAlign || 'left';
+        this.verticalAlign = config.verticalAlign || 'top';
         this.visible = config.visible !== undefined ? config.visible : true;
         this.locked = config.locked || false;
         this.selected = false;
@@ -61,9 +63,10 @@ class CustomComponent {
         ref.style.borderStyle = 'solid';
         ref.style.boxShadow = this.boxShadow;
         ref.style.opacity = this.opacity;
-        if (!this.visible) {
-            ref.style.display = 'none';
-        }
+        ref.style.textAlign = this.textAlign;
+        ref.style.display = 'flex';
+        ref.style.flexDirection = 'column';
+        ref.style.justifyContent = this.verticalAlign === 'top' ? 'flex-start' : this.verticalAlign === 'middle' ? 'center' : 'flex-end';
         this.reference = ref;
         parent.appendChild(ref);
         return ref;
@@ -120,7 +123,9 @@ class CustomComponent {
             boxShadow: this.boxShadow,
             opacity: this.opacity,
             visible: this.visible,
-            locked: this.locked
+            locked: this.locked,
+            textAlign: this.textAlign,
+            verticalAlign: this.verticalAlign,
         };
     }
     static makeComponent(json) {
@@ -132,25 +137,29 @@ class Card extends CustomComponent {
     constructor(config = {}) {
         config.type = 'card';
         super(config);
-
+        
         this.title = config.title || 'Custom Card';
         this.content = config.content || 'This is a custom card';
         this.headerBGColor = config.headerBGColor || '#f0f0f0';
         this.headerTextColor = config.headerTextColor || '#000000';
         this.contentColor = config.contentColor || '#000000';
+        this.showHeader = config.showHeader !== undefined ? config.showHeader : true;
+        this.userData = config.userData || {};
     }
     render(parent) {
         const ref = super.render(parent);
         ref.innerHTML = `
-            <div class="card-header" style="background-color: ${this.headerBGColor}; color: ${this.headerTextColor}; border-bottom: 1px solid ${this.borderColor}; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <div class="card-header" style="background-color: ${this.headerBGColor}; color: ${this.headerTextColor}; border-bottom: 1px solid ${this.borderColor}; padding: 10px; display: ${this.showHeader ? 'flex' : 'none'}; align-items: center; justify-content: space-between; border-top-left-radius: ${this.borderRadius}px; border-top-right-radius: ${this.borderRadius}px;">
                 <h2 class="card-title">${this.title}</h2>
                 <div class="card-controls"></div>
             </div>
-            <div class="card-content" style="color: ${this.contentColor};">
-                <p>${this.content}</p>
+            <div class="card-content" style="color: ${this.contentColor}; text-align: ${this.textAlign}; padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: ${this.verticalAlign === 'top' ? 'flex-start' : this.verticalAlign === 'middle' ? 'center' : 'flex-end'}; ${!this.showHeader ? `border-radius: ${this.borderRadius}px;` : ''}">
+                <p>${this.parseContent(this.content)}</p>
             </div>
         `;
+        return ref;
     }
+    
     configure(config) {
         super.configure(config);
         if (this.reference) {
@@ -177,7 +186,19 @@ class Card extends CustomComponent {
         json.headerBGColor = this.headerBGColor;
         json.headerTextColor = this.headerTextColor;
         json.contentColor = this.contentColor;
+        json.showHeader = this.showHeader;
+        json.userData = this.userData;
         return json;
+    }
+    parseContent(content) {
+        if (!content || typeof content !== 'string') return content;
+        
+        return content.replace(/\{\{(\w+)\}\}/g, (match, variable) => {
+            if (this.userData && this.userData[variable] !== undefined) {
+                return this.userData[variable];
+            }
+            return match;
+        });
     }
     static makeComponent(json) {
         return new Card(json);

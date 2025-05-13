@@ -61,7 +61,7 @@ class Editor {
             component,
             config
         });
-
+        this.rerenderComponent(component);
         return component;
     }
     rerenderComponent(component) {
@@ -379,6 +379,8 @@ class Editor {
         
         const wasSelected = component.selected;
         component.configure(config);
+
+        this.rerenderComponent(component);
         
         if (component.type === 'card' &&
             (config.title !== undefined || config.content !== undefined ||
@@ -1515,6 +1517,22 @@ class EditorInterfaceUI {
                     <input class="property-input" type="range" id="opacity" value="${component.opacity}" step="0.1" min="0" max="1">
                     <span id="opacity-value">${component.opacity}</span>    
                 </div>
+                    <div class="property-row">
+                        <label class="property-label" for="text-align">Text Align:</label>
+                        <select class="property-input" id="text-align">
+                            <option value="left" ${component.textAlign === 'left' ? 'selected' : ''}>Left</option>
+                            <option value="center" ${component.textAlign === 'center' ? 'selected' : ''}>Center</option>
+                            <option value="right" ${component.textAlign === 'right' ? 'selected' : ''}>Right</option>
+                        </select>
+                    </div>
+                    <div class="property-row">
+                        <label class="property-label" for="vertical-align">Vertical Align:</label>
+                        <select class="property-input" id="vertical-align">
+                            <option value="top" ${component.verticalAlign === 'top' ? 'selected' : ''}>Top</option>
+                            <option value="middle" ${component.verticalAlign === 'middle' ? 'selected' : ''}>Middle</option>
+                            <option value="bottom" ${component.verticalAlign === 'bottom' ? 'selected' : ''}>Bottom</option>
+                        </select>
+                    </div>
             </div>
         `;
 
@@ -1546,6 +1564,12 @@ class EditorInterfaceUI {
                         <div class="property-row">
                             <label class="property-label" for="content-color">Content Color:</label>
                             <input class="property-input" type="color" id="content-color" value="${component.contentColor}">
+                        </div>
+                        <div class="property-row">
+                            <label class="property-label">
+                                <input type="checkbox" id="show-header" ${component.showHeader ? 'checked' : ''}>
+                                Show Header
+                            </label>
                         </div>
                     </div>
                 `;
@@ -1586,18 +1610,6 @@ class EditorInterfaceUI {
             <div class="property-group-content">
                 <div class="property-row">
                     <button id="delete-component" class="editor-button danger">Delete Component</button>
-                </div>
-                <div class="property-row">
-                    <label class="property-label">
-                        <input type="checkbox" id="component-visible" ${component.visible ? 'checked' : ''}>
-                        Visible
-                    </label>
-                </div>
-                <div class="property-row">
-                    <label class="property-label">
-                        <input type="checkbox" id="component-locked" ${component.locked ? 'checked' : ''}>
-                        Locked
-                    </label>
                 </div>
             </div>
         `;
@@ -1648,6 +1660,14 @@ class EditorInterfaceUI {
             this.state.updateComponent(component.id, { opacity: value });
         });
 
+        document.getElementById('text-align').addEventListener('change', (e) => {
+            this.state.updateComponent(component.id, { textAlign: e.target.value });
+        });
+        
+        document.getElementById('vertical-align').addEventListener('change', (e) => {
+            this.state.updateComponent(component.id, { verticalAlign: e.target.value });
+        });
+
         switch (component.type) {
             case 'card':
                 document.getElementById('card-title').addEventListener('change', (e) => {
@@ -1669,6 +1689,9 @@ class EditorInterfaceUI {
                 document.getElementById('content-color').addEventListener('change', (e) => {
                     this.state.updateComponent(component.id, { contentColor: e.target.value });
                 });
+                document.getElementById('show-header').addEventListener('change', (e) => {
+                    this.state.updateComponent(component.id, { showHeader: e.target.checked });
+                });
                 break;
             case 'image':
                 document.getElementById('image-src').addEventListener('change', (e) => {
@@ -1684,12 +1707,6 @@ class EditorInterfaceUI {
                 });
                 break;
         }
-        document.getElementById('component-visible').addEventListener('change', (e) => {
-            this.state.updateComponent(component.id, { visible: e.target.checked });
-        });
-        document.getElementById('component-locked').addEventListener('change', (e) => {
-            this.state.updateComponent(component.id, { locked: e.target.checked });
-        });
 
         document.getElementById('delete-component').addEventListener('click', () => {
             if (confirm('Are you sure you want to delete this component?')) {
