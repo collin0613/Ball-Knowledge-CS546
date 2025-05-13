@@ -74,7 +74,7 @@
 
         {{!-- Display Comment Thread --}}
         <article>
-            <h4>Comments: {{comments.length}}</h4>
+            <h4 style="font-size: 20px; font-weight: bold; margin-left: 20px;">Comments: {{comments.length}}</h4>
             <ul id="commentList">
                 {{#each comments}}
                 <li>
@@ -101,7 +101,7 @@
             <label id="commentLabel" for="commentInput">Write a comment:</label>
             <input type="text" id="commentInput" name="commentInput" class="comment-input" required>
             <br>
-            <button id="submitCommentButton" type="submit">Post Comment</button>
+            <button style="font-size: 20px; font-weight: bold; margin-left: 20px;" id="submitCommentButton" type="submit">Post Comment</button>
         </form>
     </main>
 

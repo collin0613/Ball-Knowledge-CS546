@@ -81,7 +81,7 @@ export const createUser = async (
     friends: [],
     friendRequests: [], // added 5/11: friend requests received by other users. Stores as array of usernames
     creditBalance: 1000,
-    mmr: 0,
+    mmr: 999,
     rank: 'Unranked'
   };
   
@@ -268,6 +268,12 @@ export const updateUserMMR = async (username, newMMR) => {
   const updateInfo = await userCollection.updateOne(
     { username: username },
     { $set: { mmr: newMMR } }
+  );
+
+  rank = 'Unranked' ? mmr < 1000 : 'Bronze' ? mmr < 1500 : 'Silver' ? mmr < 2000 : 'Gold' ? mmr < 2500 : 'Platinum' ? mmr < 3000 : 'Diamond' ? mmr < 3500 : 'Master' ? mmr < 4000 : 'Grandmaster';
+  const updateRankInfo = await userCollection.updateOne(
+    { username: username },
+    { $set: { rank: rank } }
   );
   
   if (!updateInfo.acknowledged) {

@@ -69,23 +69,18 @@ class ProfileEditor {
         .then(response => response.json())
         .then(data => {
             if (data && Object.keys(data).length > 0) {
-                const wasEditMode = this.state.getEditMode();
                 this.state.loadJSON(data);
-                if (!this.isCurrentUser) {
-                    this.state.setEditMode(false);
-                } else if (wasEditMode) {
-                    this.state.setEditMode(wasEditMode);
-                }
+                this.state.setEditMode(false);
             } else {
                 console.log('No existing profile found, initializing default content');
                 this.initDefaultContent();
             }
             
-            this.setMode(this.isCurrentUser);
+            this.setMode(false);
         })
         .catch(error => {
             console.error('Error loading profile:', error);
-            this.setMode(this.isCurrentUser);
+            this.setMode(false);
         });
     }
 

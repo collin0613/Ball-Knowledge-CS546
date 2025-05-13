@@ -28,23 +28,6 @@
             },
         };
     </script>
-    <style>
-        @keyframes marquee {
-            0% {
-                transform: translateX(100%);
-            }
-
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-
-        .animate-marquee {
-            display: inline-block;
-            white-space: nowrap;
-            animation: marquee 20s linear infinite;
-        }
-    </style>
     <link href="https://fonts.googleapis.com/css2?family=Special+Gothic+Condensed+One&display=swap" rel="stylesheet">
 </head>
 
@@ -89,21 +72,6 @@
   {{/if}}
             </div>
         </nav>
-        <div
-            class="overflow-hidden whitespace-nowrap bg-dark_hover text-light py-2 fixed top-[80px] left-0 right-0 z-10">
-            <div class="w-max animate-marquee">
-                {{#if news}}
-                {{#each news}}
-                <span class="mx-8">{{this}}</span>
-                {{/each}}
-                {{else}}
-                <span class="mx-8">Lebron scores 50 points</span>
-                <span class="mx-8">Giannis blocks 3 shots</span>
-                <span class="mx-8">Luka scores 40 points</span>
-                <span class="mx-8">Jayson scores 30 points</span>
-                {{/if}}
-            </div>
-        </div>
     </header>
     <main class="mt-[120px]">
         {{{body}}}

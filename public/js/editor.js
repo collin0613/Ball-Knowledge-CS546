@@ -529,7 +529,7 @@ class EditorInterfaceUI {
                 display: flex !important;
                 align-items: center !important;
                 position: fixed !important;
-                top: 120px !important;
+                top: 80px !important;
                 left: 0 !important;
                 right: 0 !important;
                 z-index: 30 !important;
@@ -555,7 +555,7 @@ class EditorInterfaceUI {
             .editor-components-container {
                 position: fixed !important;
                 left: 0 !important;
-                top: 181px !important;
+                top: 141px !important;
                 bottom: 0 !important;
                 width: 250px !important;
                 display: flex !important;
@@ -565,7 +565,7 @@ class EditorInterfaceUI {
             .editor-properties-container {
                 position: fixed !important;
                 right: 0 !important;
-                top: 181px !important; 
+                top: 141px !important; 
                 bottom: 0 !important;
                 width: 300px !important;
                 display: flex !important;
@@ -807,7 +807,7 @@ class EditorInterfaceUI {
                 border-bottom: none !important;
                 padding: 5px !important;
                 position: fixed !important;
-                top: 120px !important;
+                top: 80px !important;
                 right: 0 !important;
                 z-index: 9 !important;
             }
