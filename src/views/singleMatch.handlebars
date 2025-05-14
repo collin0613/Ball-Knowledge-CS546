@@ -96,12 +96,12 @@
         </article>
 
         {{!-- Post a Comment --}}
-        <p id="commentError"></p>
-        <form action="/matchups/{{leaguePath}}/{{uid}}/submitComment" method="POST" id="postCommentForm">
-            <label id="commentLabel" for="commentInput">Write a comment:</label>
-            <input type="text" id="commentInput" name="commentInput" class="comment-input" required>
-            <br>
-            <button id="submitCommentButton" type="submit">Post Comment</button>
+        <form action="/matchups/{{leaguePath}}/{{uid}}/submitComment" method="POST" id="postCommentForm" class="flex flex-col items-center mt-6 mb-10">
+            <label for="commentInput" class="text-lg font-semibold mb-2">Write a comment:</label>
+            <input type="text" id="commentInput" name="commentInput" class="w-4/5 max-w-xl px-4 py-2 text-base border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent shadow-sm mb-3" placeholder="Type your comment here..." required>
+            <button type="submit" id="submitCommentButton" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-6 rounded-full transition-all duration-200 shadow-md">
+                Post Comment
+            </button>
         </form>
     </main>
 
@@ -244,10 +244,10 @@
         left: 0;
         margin-top: 140px;
         margin-left: 30px;
-        background-color: #8f8f8f;
-        border: 3px solid #515151;
+        background-color: #3f3157;
+        border: 3px solid #ffffff;
         border-radius: 28px;
-        padding: 5px;
+        padding: 10px;
         color: #ffffff;
     }
     .submit-pick {
