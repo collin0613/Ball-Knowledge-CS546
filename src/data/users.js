@@ -1,7 +1,7 @@
 import { users } from '../config/mongoCollections.js';
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'mongodb';
-import adjustMMR  from '../utils/adjustMMR.js';
+import adjustMMR from '../utils/adjustMMR.js';
 
 export const createUser = async (
   firstName,
@@ -82,7 +82,7 @@ export const createUser = async (
     friends: [],
     friendRequests: [], // added 5/11: friend requests received by other users. Stores as array of usernames
     creditBalance: 1000,
-    mmr: 999,
+    mmr: 0,
     rank: 'Unranked'
   };
   
@@ -206,31 +206,26 @@ export const updatePicksOnGame = async (game) => {
               const newPick = `${pickDate},${pickLeague},${pickTeam},${result},${pickOdds},${pickWager},${pickPayout},${pickMMR}`; // adds in new result. possibly could make into a more readable format for user?
               let newUserPickHistory = userPickHistory;
               newUserPickHistory[i] = {pick: newPick};
-              // pickMMR = calculatePickMMR(newPick); // todo: implement calculatePickMMR function that takes in a pick and returns the mmr gain/loss depending on the pick information such as odds, wager amount, etc
-              if (pickMMR === "MMR") pickMMR = 0; // this line can be removed once MMR is implemented, as the pick.mmr value is "MMR" as a placeholder, and it might throw errors updating the mmr in testing while this is still not implemented
               if (result === 'L') {
-                adjustMMR(user, pickWager, pickOdds, 'loss', user.mmr);
+                adjustMMR(user.username, pickWager, pickOdds, 'loss', user.mmr);
                 pickPayout = 0; 
               } else {
-                adjustMMR(user, pickWager, pickOdds, 'win', user.mmr);
+                adjustMMR(user.username, pickWager, pickOdds, 'win', user.mmr);
                 pickPayout = parseInt(pickPayout);
               }
-              if (newUserPickHistory[i] !== user.pickHistory[i]) { // the updated pick is identical to the one in the db, so this pick update has already been processed and we do not update user repeatedly
-                const updatePickInfo = await userCollection.updateOne(
-                  { _id: user._id },
-                  {
-                    $set: { 
-                      creditBalance: parseInt(user.creditBalance + pickPayout),
-                      pickHistory: newUserPickHistory
-                // todo: the amount of MMR awarded per win should already be calculated when pick is submitted and in pickMMR. need to make function for calculating mmr --> calculatePickMMR() in line 201
-                // maybe we can get rid of storing mmr for each pick since win/loss amounts are not always of the same magnitude. function calls and calculates mmr gain/loss based on pick info and is updated
-                // furthermore, in this function, rank adjusting logic for the user should be implemented
-                    }
-                  }
-                );
-                if (!updatePickInfo) throw new Error("Could not update user for the new result of a match picked.");
+              // if (newUserPickHistory[i] !== user.pickHistory[i]) { // the updated pick is identical to the one in the db, so this pick update has already been processed and we do not update user repeatedly
+              //   const updatePickInfo = await userCollection.updateOne(
+              //     { _id: user._id },
+              //     {
+              //       $set: { 
+              //         creditBalance: parseInt(user.creditBalance + pickPayout),
+              //         pickHistory: newUserPickHistory
+              //       }
+              //     }
+              //   );
+              //if (!updatePickInfo) throw new Error("Could not update user for the new result of a match picked.");
                 updatedPicksArr.push({user: user.username, pick: newPick}); 
-              }
+              //}
             }
           }
           i = i+1;
@@ -275,18 +270,37 @@ export const getProfileEditorState = async (username) => {
   return user.profileCustomization || {};
 };
 
+
 export const updateUserMMR = async (username, newMMR) => {
   if (!username || !newMMR) {
     throw 'Username and new MMR must be provided';
   }
-  
+  newMMR = Math.round(newMMR);
   const userCollection = await users();
   const updateInfo = await userCollection.updateOne(
     { username: username },
     { $set: { mmr: newMMR } }
   );
 
-  let rank = 'Unranked' ? newMMR < 1000 : 'Bronze' ? newMMR < 1500 : 'Silver' ? newMMR < 2000 : 'Gold' ? newMMR < 2500 : 'Platinum' ? newMMR < 3000 : 'Diamond' ? newMMR < 3500 : 'Master' ? newMMR < 4000 : 'Grandmaster';
+  let rank;
+  if (newMMR <= 0) {
+    rank = 'Unranked';
+  } else if (newMMR < 1000) {
+    rank = 'Bronze';
+  } else if (newMMR < 1500) {
+    rank = 'Silver';
+  } else if (newMMR < 2000) {
+    rank = 'Gold';
+  } else if (newMMR < 2500) {
+    rank = 'Platinum';
+  } else if (newMMR < 3000) {
+    rank = 'Diamond';
+  } else if (newMMR < 3500) {
+    rank = 'Master';
+  } else if (newMMR < 4000) {
+    rank = 'Elite';
+  }
+
   const updateRankInfo = await userCollection.updateOne(
     { username: username },
     { $set: { rank: rank } }

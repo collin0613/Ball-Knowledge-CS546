@@ -8,6 +8,9 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import MongoStore from 'connect-mongo';
 import dotenv from 'dotenv';
+import {users} from './src/config/mongoCollections.js';
+import adjustMMR from './src/utils/adjustMMR.js'
+import {updateUserMMR} from './src/data/users.js'
 import { postOddsBySport, getMatchResults } from './src/data/sportsData.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -79,6 +82,7 @@ app.set('view engine', 'handlebars');
 // console.log(data);
 
 configRoutesFunction(app);
+
 
 app.listen(3000, () => {
   console.log("We've now got a server!");
