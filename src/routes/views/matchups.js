@@ -210,6 +210,7 @@ router
 
 router.route('/matchups/:league/:gameUID/submitPick').post(async (req, res) => {
   try {
+    
     const teamPick = req.body.selectTeamPick;
     const [teamName, oddsStr, gameUID] = teamPick.split(',');
     const creditAmount = Number(req.body.creditsInput);
@@ -242,11 +243,14 @@ router.route('/matchups/:league/:gameUID/submitPick').post(async (req, res) => {
     if (user.creditBalance < wager) throw new Error('Wager creditAmount cannot exceed your credit balance.');
     const newBalance = user.creditBalance - wager;
     let updateInfo;
+    await postOddsBySport(league);
     const gameCollection = await games();
     const gameOfPick = await gameCollection.findOne({ uid: gameUID });
     const startDateEST = gameOfPick.startDateEST;
     if (!user) throw new Error(`User not found with id of ${userId}`)
-
+    if (parseInt(oddsStr) !== gameOfPick.awayOdds && parseInt(oddsStr) !== gameOfPick.homeOdds) {    
+      return res.redirect(`/matchups/${league}/${gameUID}`);
+    } 
     const userUpdateInfo = await userCollection.updateOne(
       { _id: userId },
       {

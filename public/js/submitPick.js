@@ -37,11 +37,9 @@
           confirmed = true;
           return;
         }
+        submitPickForm.submit();
         pickMessage.hidden = false;
         pickMessage.innerHTML = `Your ${creditAmount} credit pick for the ${teamName} has been placed!`;
-        submitPickForm.submit();
-        //todo: update the user's creditBalance in the db to subtract the creditAmount of the wager --> tried to implement in router/views/matchups.js with POST /matchups/:league/:gameUID/submitPick (Collin)
-        
       } else {
         throw new Error("You must provide a valid input");
       }
