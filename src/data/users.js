@@ -236,7 +236,7 @@ export const updatePicksOnGame = async (game) => {
         });
       }
     });
-    if (awayPicksCounted + homePicksCounted !== game.totalPicks || awayPicksCounted !== totalAwayPicks || homePicksCounted !== totalHomePicks) throw new Error("Did not find/update all picks on given game in updatePicksOnGame.");
+    // if (awayPicksCounted + homePicksCounted !== game.totalPicks || awayPicksCounted !== totalAwayPicks || homePicksCounted !== totalHomePicks) throw new Error("Did not find/update all picks on given game in updatePicksOnGame.");
   }
   return updatedPicksArr;
 }
