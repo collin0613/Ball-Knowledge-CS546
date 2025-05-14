@@ -301,7 +301,7 @@ export const updateUserMMR = async (username, newMMR) => {
     rank = 'Diamond';
   } else if (newMMR < 3500) {
     rank = 'Master';
-  } else if (newMMR < 4000) {
+  } else if (newMMR >= 3500){
     rank = 'Elite';
   }
 
