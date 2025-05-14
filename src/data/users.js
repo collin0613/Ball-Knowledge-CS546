@@ -222,19 +222,19 @@ export const updatePicksOnGame = async (game) => {
                 adjustMMR(user.username, pickWager, pickOdds, 'win', user.mmr);
                 pickPayout = parseInt(pickPayout);
               }
-              // if (newUserPickHistory[i] !== user.pickHistory[i]) { // the updated pick is identical to the one in the db, so this pick update has already been processed and we do not update user repeatedly
-              //   const updatePickInfo = await userCollection.updateOne(
-              //     { _id: user._id },
-              //     {
-              //       $set: { 
-              //         creditBalance: parseInt(user.creditBalance + pickPayout),
-              //         pickHistory: newUserPickHistory
-              //       }
-              //     }
-              //   );
-              //if (!updatePickInfo) throw new Error("Could not update user for the new result of a match picked.");
+              if (newUserPickHistory[i] !== user.pickHistory[i]) { // the updated pick is identical to the one in the db, so this pick update has already been processed and we do not update user repeatedly
+                const updatePickInfo = await userCollection.updateOne(
+                  { _id: user._id },
+                  {
+                    $set: { 
+                      creditBalance: parseInt(user.creditBalance + pickPayout),
+                      pickHistory: newUserPickHistory
+                    }
+                  }
+                );
+              if (!updatePickInfo) throw new Error("Could not update user for the new result of a match picked.");
                 updatedPicksArr.push({user: user.username, pick: newPick}); 
-              //}
+              }
             }
           }
           i = i+1;
