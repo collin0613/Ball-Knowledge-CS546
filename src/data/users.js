@@ -83,14 +83,9 @@ export const createUser = async (
     friends: [],
     friendRequests: [], // added 5/11: friend requests received by other users. Stores as array of usernames
     creditBalance: 1000,
-<<<<<<< HEAD
-    mmr: 0,
-    rank: 'Unranked'
-=======
     mmr: 999,
     rank: 'Unranked',
     lastCreditUpdate: new Date().toISOString().split('T')[0]
->>>>>>> adaa1a6bf7817d5826fc0770fb9d1ac2099f2d30
   };
   
   const insertInfo = await userCollection.insertOne(newUser);
@@ -206,7 +201,7 @@ export const updatePicksOnGame = async (game) => {
           let [pickDate, pickLeague, pickTeam, pickResult, pickOdds, pickWager, pickPayout, pickMMR] = (String(userPick.pick)).split(",");
           // ”MM/DD/YYYY,LEAGUE,TEAM,W/L/TBA,ODDS,WAGER,PAYOUT,MMR"
 
-          if (pickDate === gameDate && (pickLeague.toLowerCase()).includes(game.league.toLowerCase())) { // TODO: add in check that pickResult === 'TBA' so pick payouts aren't duplicated
+          if (pickDate === gameDate && (pickLeague.toLowerCase()).includes(game.league.toLowerCase()) && pickResult === 'TBA') { // TODO: add in check that pickResult === 'TBA' so pick payouts aren't duplicated
             if ((pickTeam === homeTeam) || (pickTeam === awayTeam)) {
               if (pickTeam === winningTeam) result = 'W'; else result = 'L';
               if (pickTeam === awayTeam) awayPicksCounted = awayPicksCounted + 1;
