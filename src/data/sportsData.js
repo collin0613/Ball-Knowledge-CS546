@@ -146,7 +146,20 @@ export const postOddsBySport = async (sportKey) => {
         const insertInfo = await gameCollection.insertOne(game);
         if(!insertInfo.acknowledged || !insertInfo.insertedId) throw new Error(`Could not add game: ${game}`);
       }else{
-        continue;
+        if (tryInsert.awayOdds !== game.awayOdds || tryInsert.homeOdds !== game.homeOdds) { // if odds received from API have changed since the game was initially inserted to the DB, then update the game in DB with new odds          const oddsUpdatedInfo = await userCollection.updateOne(
+          const updatedOddsInfo = await gameCollection.updateOne(
+            {uid: game.uid},
+            {
+              $set: {
+                awayOdds: game.awayOdds,
+                homeOdds: game.homeOdds
+              }
+            }
+          );
+          if (!updatedOddsInfo) throw new Error(`Failed to update game uid ${game.uid} with new odds.`);
+        } else {
+          continue;
+        }
       }
     }
     return insertGames;
@@ -195,6 +208,8 @@ export const getMatchByID = async (id) => {
     const gameCollection = await games();
     const foundMatch = await gameCollection.findOne({uid: id});
     if (!foundMatch) throw new Error(`No game found with UID ${id}.`);
+
+
     return foundMatch;
   } catch (e) {
     console.error('Error status: ', e.response?.status);
@@ -334,7 +349,7 @@ export const updateMatches = async (resultsArray) => {
         updatedCount++;
         matched = true;
         const newGame = await gameCollection.findOne({_id: record._id});
-        updatePicksOnGame(newGame);// calls function that updates picks on this one game now that a result has been added
+        await updatePicksOnGame(newGame);// calls function that updates picks on this one game now that a result has been added
         break;
       }
     }

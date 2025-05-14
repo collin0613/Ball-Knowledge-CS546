@@ -183,45 +183,55 @@ export const updatePicksOnGame = async (game) => {
     const userCollection = await users();
     const userArray = await userCollection.find().toArray();
     userArray.forEach(user => {
-      let userPickHistory = user.pickHistory;
+      let userPickHistory = [];
+      let userPicksArr = user.pickHistory;
+      userPicksArr.forEach(p => {
+        userPickHistory.push(p)
+      });
+
       if (userPickHistory.length > 0) {
         let i = 0;
-        userPickHistory.forEach(userPick => {
+        userPickHistory.forEach(async userPick => {
           let result;
-          let [pickDate, pickLeague, pickTeam, pickResult, pickOdds, pickWager, pickPayout, pickMMR] = userPick.pick.split(',');
+          let [pickDate, pickLeague, pickTeam, pickResult, pickOdds, pickWager, pickPayout, pickMMR] = (String(userPick.pick)).split(",");
           // ”MM/DD/YYYY,LEAGUE,TEAM,W/L/TBA,ODDS,WAGER,PAYOUT,MMR"
 
-          if (pickDate === gameDate && userPick.pick.includes(pickLeague.toLowerCase()) && pickResult === "TBA") {
-            if (userPick.pick.includes(winningTeam)) result = 'W'; else result = 'L';
-            if (pickTeam === awayTeam) awayPicksCounted = awayPicksCounted + 1;
-            if (pickTeam === homeTeam) homePicksCounted = homePicksCounted + 1;
-            const newPick = `${pickDate},${pickLeague},${pickTeam},${result},${pickOdds},${pickWager},${pickPayout},${pickMMR}`; // adds in new result. possibly could make into a more readable format for user?
-            let newUserPickHistory = userPickHistory;
-            newUserPickHistory[i] = {pick: newPick};
-            pickMMR = calculatePickMMR(newPick); // todo: implement calculatePickMMR function that takes in a pick and returns the mmr gain/loss depending on the pick information such as odds, wager amount, etc
-            if (pickMMR === "MMR") pickMMR = 0; // this line can be removed once MMR is implemented, as the pick.mmr value is "MMR" as a placeholder, and it might throw errors updating the mmr in testing while this is still not implemented
-            if (result === 'L') pickPayout = 0;
-            const updatePickInfo = userCollection.updateOne(
-              { _id: user._id },
-              {
-                $set: { 
-                  creditBalance: user.creditBalance + pickPayout,
-                  pickHistory: newUserPickHistory,
-                  mmr: user.mmr + pickMMR
-          // todo: the amount of MMR awarded per win should already be calculated when pick is submitted and in pickMMR. need to make function for calculating mmr --> calculatePickMMR() in line 201
-          // maybe we can get rid of storing mmr for each pick since win/loss amounts are not always of the same magnitude. function calls and calculates mmr gain/loss based on pick info and is updated
-          // furthermore, in this function, rank adjusting logic for the user should be implemented
-                }
+          if (pickDate === gameDate && (pickLeague.toLowerCase()).includes(game.league.toLowerCase())) { // TODO: add in check that pickResult === 'TBA' so pick payouts aren't duplicated
+            if ((pickTeam === homeTeam) || (pickTeam === awayTeam)) {
+              if (pickTeam === winningTeam) result = 'W'; else result = 'L';
+              if (pickTeam === awayTeam) awayPicksCounted = awayPicksCounted + 1;
+              if (pickTeam === homeTeam) homePicksCounted = homePicksCounted + 1;
+              
+              const newPick = `${pickDate},${pickLeague},${pickTeam},${result},${pickOdds},${pickWager},${pickPayout},${pickMMR}`; // adds in new result. possibly could make into a more readable format for user?
+              let newUserPickHistory = userPickHistory;
+              newUserPickHistory[i] = {pick: newPick};
+              // pickMMR = calculatePickMMR(newPick); // todo: implement calculatePickMMR function that takes in a pick and returns the mmr gain/loss depending on the pick information such as odds, wager amount, etc
+              if (pickMMR === "MMR") pickMMR = 0; // this line can be removed once MMR is implemented, as the pick.mmr value is "MMR" as a placeholder, and it might throw errors updating the mmr in testing while this is still not implemented
+              if (result === 'L') pickPayout = 0; else pickPayout = parseInt(pickPayout);
+              if (newUserPickHistory[i] !== user.pickHistory[i]) { // the updated pick is identical to the one in the db, so this pick update has already been processed and we do not update user repeatedly
+                const updatePickInfo = await userCollection.updateOne(
+                  { _id: user._id },
+                  {
+                    $set: { 
+                      creditBalance: parseInt(user.creditBalance + pickPayout),
+                      pickHistory: newUserPickHistory,
+                      mmr: user.mmr + pickMMR
+                // todo: the amount of MMR awarded per win should already be calculated when pick is submitted and in pickMMR. need to make function for calculating mmr --> calculatePickMMR() in line 201
+                // maybe we can get rid of storing mmr for each pick since win/loss amounts are not always of the same magnitude. function calls and calculates mmr gain/loss based on pick info and is updated
+                // furthermore, in this function, rank adjusting logic for the user should be implemented
+                    }
+                  }
+                );
+                if (!updatePickInfo) throw new Error("Could not update user for the new result of a match picked.");
+                updatedPicksArr.push({user: user.username, pick: newPick}); 
               }
-            );
-            if (!updatePickInfo) throw new Error("Could not update user for the new result of a match picked.");
-            updatedPicksArr.push({user: user.username, pick: newPick});
+            }
           }
           i = i+1;
         });
       }
     });
-    if (awayPicksCounted + homePicksCounted !== game.totalPicks || awayPicksCounted !== totalAwayPicks || homePicksCounted !== totalHomePicks) throw new Error("Error: did not find/update all picks on given game in updatePicksOnGame.");
+    if (awayPicksCounted + homePicksCounted !== game.totalPicks || awayPicksCounted !== totalAwayPicks || homePicksCounted !== totalHomePicks) throw new Error("Did not find/update all picks on given game in updatePicksOnGame.");
   }
   return updatedPicksArr;
 }
