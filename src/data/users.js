@@ -201,7 +201,7 @@ export const updatePicksOnGame = async (game) => {
           let [pickDate, pickLeague, pickTeam, pickResult, pickOdds, pickWager, pickPayout, pickMMR] = (String(userPick.pick)).split(",");
           // ”MM/DD/YYYY,LEAGUE,TEAM,W/L/TBA,ODDS,WAGER,PAYOUT,MMR"
 
-          if (pickDate === gameDate && (pickLeague.toLowerCase()).includes(game.league.toLowerCase()) && pickResult === 'TBA') { // TODO: add in check that pickResult === 'TBA' so pick payouts aren't duplicated
+          if (pickDate === gameDate && (pickLeague.toLowerCase()).includes(game.league.toLowerCase()) && pickResult === "TBA") { // TODO: add in check that pickResult === 'TBA' so pick payouts aren't duplicated
             if ((pickTeam === homeTeam) || (pickTeam === awayTeam)) {
               if (pickTeam === winningTeam) result = 'W'; else result = 'L';
               if (pickTeam === awayTeam) awayPicksCounted = awayPicksCounted + 1;
@@ -210,14 +210,14 @@ export const updatePicksOnGame = async (game) => {
               const newPick = `${pickDate},${pickLeague},${pickTeam},${result},${pickOdds},${pickWager},${pickPayout},${pickMMR}`; // adds in new result. possibly could make into a more readable format for user?
               let newUserPickHistory = userPickHistory;
               newUserPickHistory[i] = {pick: newPick};
-              if (result === 'L') {
-                adjustMMR(user.username, pickWager, pickOdds, 'loss', user.mmr);
-                pickPayout = 0; 
-              } else {
-                adjustMMR(user.username, pickWager, pickOdds, 'win', user.mmr);
-                pickPayout = parseInt(pickPayout);
-              }
               if (newUserPickHistory[i] !== user.pickHistory[i]) { // the updated pick is identical to the one in the db, so this pick update has already been processed and we do not update user repeatedly
+                if (result === 'L') {
+                  adjustMMR(user.username, pickWager, pickOdds, 'loss', user.mmr);
+                  pickPayout = 0; 
+                } else {
+                  adjustMMR(user.username, pickWager, pickOdds, 'win', user.mmr);
+                  pickPayout = parseInt(pickPayout);
+                }
                 const updatePickInfo = await userCollection.updateOne(
                   { _id: user._id },
                   {
