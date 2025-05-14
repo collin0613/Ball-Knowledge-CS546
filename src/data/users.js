@@ -83,14 +83,9 @@ export const createUser = async (
     friends: [],
     friendRequests: [], // added 5/11: friend requests received by other users. Stores as array of usernames
     creditBalance: 1000,
-<<<<<<< HEAD
-    mmr: 0,
-    rank: 'Unranked'
-=======
     mmr: 999,
     rank: 'Unranked',
     lastCreditUpdate: new Date().toISOString().split('T')[0]
->>>>>>> adaa1a6bf7817d5826fc0770fb9d1ac2099f2d30
   };
   
   const insertInfo = await userCollection.insertOne(newUser);
