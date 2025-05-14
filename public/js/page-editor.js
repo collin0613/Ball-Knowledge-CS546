@@ -89,7 +89,7 @@ class ProfileEditor {
         
         const userData = {
             username: username,
-            mmr: 0,
+            mmr: 999,
             rank: 'Unranked',
             creditBalance: 0,
             friends: [],
