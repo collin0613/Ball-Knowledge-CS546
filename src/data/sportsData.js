@@ -369,7 +369,7 @@ export const getMatchResults = async (league) => {
   let url;
   //creating the date string for YESTERDAY since the NHL API shows all upcoming games given a date. So calling https://api-web.nhle.com/v1/schedule/2025-05-11 will give you all games on 2025-05-11 and on, all of which have NOT ended yet. 
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1); 
+  yesterday.setDate(yesterday.getDate() - 7); // todo: change back to 1!
   const formatted = yesterday.toISOString().split('T')[0];
   //determine which API to call given the league. some are public and dont require a key (NHL), while some do (NBA)
   switch (league.toLowerCase()) {
