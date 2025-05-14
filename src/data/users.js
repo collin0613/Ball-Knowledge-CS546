@@ -16,7 +16,8 @@ export const createUser = async (
   friendRequests,
   creditBalance,
   mmr,
-  rank
+  rank,
+  lastCreditUpdate
 ) => {
   // input validation
   if (!firstName || !lastName || !email || !username || !password) {
@@ -83,7 +84,8 @@ export const createUser = async (
     friendRequests: [], // added 5/11: friend requests received by other users. Stores as array of usernames
     creditBalance: 1000,
     mmr: 999,
-    rank: 'Unranked'
+    rank: 'Unranked',
+    lastCreditUpdate: new Date().toISOString().split('T')[0]
   };
   
   const insertInfo = await userCollection.insertOne(newUser);
@@ -123,7 +125,8 @@ export const getUserById = async (userId) => {
     creditBalance: user.creditBalance,
     mmr: user.mmr,
     rank: user.rank,
-    username: user.username
+    username: user.username,
+    lastCreditUpdate: user.lastCreditUpdate
   };
 }
 
@@ -150,7 +153,8 @@ export const getUserByUsername = async (username) => {
     friends: user.friends,
     creditBalance: user.creditBalance,
     mmr: user.mmr,
-    rank: user.rank
+    rank: user.rank,
+    lastCreditUpdate: user.lastCreditUpdate
   };
 }
 
