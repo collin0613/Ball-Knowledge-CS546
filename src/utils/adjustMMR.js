@@ -18,3 +18,5 @@ function adjustMMR(username, wager, odds, result, oldMMR){
     }
     updateUserMMR(username, newMMR);
 } 
+
+export default adjustMMR;

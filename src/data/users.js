@@ -1,6 +1,7 @@
 import { users } from '../config/mongoCollections.js';
 import bcrypt from 'bcrypt';
 import { ObjectId } from 'mongodb';
+import adjustMMR  from '../utils/adjustMMR.js';
 
 export const createUser = async (
   firstName,
@@ -207,15 +208,20 @@ export const updatePicksOnGame = async (game) => {
               newUserPickHistory[i] = {pick: newPick};
               // pickMMR = calculatePickMMR(newPick); // todo: implement calculatePickMMR function that takes in a pick and returns the mmr gain/loss depending on the pick information such as odds, wager amount, etc
               if (pickMMR === "MMR") pickMMR = 0; // this line can be removed once MMR is implemented, as the pick.mmr value is "MMR" as a placeholder, and it might throw errors updating the mmr in testing while this is still not implemented
-              if (result === 'L') pickPayout = 0; else pickPayout = parseInt(pickPayout);
+              if (result === 'L') {
+                adjustMMR(user, pickWager, pickOdds, 'loss', user.mmr);
+                pickPayout = 0; 
+              } else {
+                adjustMMR(user, pickWager, pickOdds, 'win', user.mmr);
+                pickPayout = parseInt(pickPayout);
+              }
               if (newUserPickHistory[i] !== user.pickHistory[i]) { // the updated pick is identical to the one in the db, so this pick update has already been processed and we do not update user repeatedly
                 const updatePickInfo = await userCollection.updateOne(
                   { _id: user._id },
                   {
                     $set: { 
                       creditBalance: parseInt(user.creditBalance + pickPayout),
-                      pickHistory: newUserPickHistory,
-                      mmr: user.mmr + pickMMR
+                      pickHistory: newUserPickHistory
                 // todo: the amount of MMR awarded per win should already be calculated when pick is submitted and in pickMMR. need to make function for calculating mmr --> calculatePickMMR() in line 201
                 // maybe we can get rid of storing mmr for each pick since win/loss amounts are not always of the same magnitude. function calls and calculates mmr gain/loss based on pick info and is updated
                 // furthermore, in this function, rank adjusting logic for the user should be implemented
