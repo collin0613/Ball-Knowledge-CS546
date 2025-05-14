@@ -286,7 +286,7 @@ export const updateUserMMR = async (username, newMMR) => {
     { $set: { mmr: newMMR } }
   );
 
-  rank = 'Unranked' ? mmr < 1000 : 'Bronze' ? mmr < 1500 : 'Silver' ? mmr < 2000 : 'Gold' ? mmr < 2500 : 'Platinum' ? mmr < 3000 : 'Diamond' ? mmr < 3500 : 'Master' ? mmr < 4000 : 'Grandmaster';
+  let rank = 'Unranked' ? newMMR < 1000 : 'Bronze' ? newMMR < 1500 : 'Silver' ? newMMR < 2000 : 'Gold' ? newMMR < 2500 : 'Platinum' ? newMMR < 3000 : 'Diamond' ? newMMR < 3500 : 'Master' ? newMMR < 4000 : 'Grandmaster';
   const updateRankInfo = await userCollection.updateOne(
     { username: username },
     { $set: { rank: rank } }
