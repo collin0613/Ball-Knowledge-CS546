@@ -71,8 +71,29 @@ router.route('/login')
         rank: user.rank,
         mmr: user.mmr,
         creditBalance: user.creditBalance,
-        friends: user.friends
+        friends: user.friends,
+        lastCreditUpdate: user.lastCreditUpdate,
+        pickHistory: user.pickHistory,
+        friendRequests: user.friendRequests,
+        lastCreditUpdate: user.lastCreditUpdate,
       };
+      // check if credit balance needs to be updated
+      const today = new Date().toISOString().split('T')[0];
+      if (user.lastCreditUpdate !== today) {
+        const updatedUser = await userCollection.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              creditBalance: user.creditBalance + 100,
+              lastCreditUpdate: today
+            }
+          }
+        );
+        if (!updatedUser) {
+          throw 'Could not update credit balance';
+        }
+        req.session.user.creditBalance += 100;
+      }
       
       return res.redirect('/');
       
